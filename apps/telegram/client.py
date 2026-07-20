@@ -1,0 +1,99 @@
+"""Low-level Telegram Bot API client."""
+
+from __future__ import annotations
+
+import json
+import logging
+import urllib.error
+import urllib.parse
+import urllib.request
+from typing import Any
+
+from django.conf import settings
+
+from apps.telegram.exceptions import TelegramAPIError, TelegramDisabledError
+
+logger = logging.getLogger(__name__)
+
+
+def _require_enabled() -> str:
+    """Return the configured bot token or raise when integration is disabled."""
+    if not settings.TELEGRAM_ENABLED:
+        raise TelegramDisabledError("Telegram integration is disabled.")
+    token = settings.TELEGRAM_BOT_TOKEN
+    if not token:
+        raise TelegramDisabledError("TELEGRAM_BOT_TOKEN is not configured.")
+    return token
+
+
+def call_method(method: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Call a Telegram Bot API method and return the parsed response body."""
+    token = _require_enabled()
+    url = f"https://api.telegram.org/bot{token}/{method}"
+    data = json.dumps(payload or {}).encode("utf-8")
+    request = urllib.request.Request(
+        url,
+        data=data,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            body = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        error_body = exc.read().decode("utf-8", errors="replace")
+        logger.warning(
+            "Telegram API HTTP error",
+            extra={"method": method, "status_code": exc.code, "body": error_body},
+        )
+        raise TelegramAPIError(error_body or str(exc), status_code=exc.code) from exc
+    except urllib.error.URLError as exc:
+        logger.warning("Telegram API connection error", extra={"method": method})
+        raise TelegramAPIError(str(exc)) from exc
+
+    if not body.get("ok"):
+        description = body.get("description", "Unknown Telegram API error")
+        logger.warning(
+            "Telegram API returned error",
+            extra={"method": method, "description": description},
+        )
+        raise TelegramAPIError(description)
+
+    return body
+
+
+def send_message(*, chat_id: int, text: str, parse_mode: str | None = None) -> dict[str, Any]:
+    """Send a text message to a Telegram chat."""
+    payload: dict[str, Any] = {"chat_id": chat_id, "text": text}
+    if parse_mode:
+        payload["parse_mode"] = parse_mode
+    return call_method("sendMessage", payload)
+
+
+def get_updates(*, offset: int | None = None, timeout: int = 30) -> list[dict[str, Any]]:
+    """Fetch pending updates using long polling."""
+    payload: dict[str, Any] = {"timeout": timeout}
+    if offset is not None:
+        payload["offset"] = offset
+    body = call_method("getUpdates", payload)
+    return body.get("result", [])
+
+
+def set_webhook(*, url: str, secret_token: str | None = None) -> dict[str, Any]:
+    """Register the bot webhook URL."""
+    payload: dict[str, Any] = {"url": url}
+    if secret_token:
+        payload["secret_token"] = secret_token
+    return call_method("setWebhook", payload)
+
+
+def delete_webhook() -> dict[str, Any]:
+    """Remove the bot webhook."""
+    return call_method("deleteWebhook", {"drop_pending_updates": False})
+
+
+def build_bot_deeplink(*, start_parameter: str) -> str:
+    """Build a t.me link that opens the bot with a /start payload."""
+    username = settings.TELEGRAM_BOT_USERNAME.lstrip("@")
+    encoded = urllib.parse.quote(start_parameter)
+    return f"https://t.me/{username}?start={encoded}"

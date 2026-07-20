@@ -1,0 +1,136 @@
+STUDIO MANAGEMENT — DEVELOPMENT COMMANDS
+========================================
+
+FIRST START (build, migrate, collect static, start, verify)
+  ./run.sh
+
+DOCKER BROKEN (Snap / daemon / compose errors)
+  sudo ./scripts/setup-docker.sh
+  newgrp docker
+  docker info
+  ./run.sh
+
+SERVICE URLS
+  Application:   http://localhost:8080
+  Admin:         http://localhost:8080/admin/
+  Health:        http://localhost:8080/health/
+  Readiness:     http://localhost:8080/health/ready/
+  API v1:        http://localhost:8080/api/v1/
+  Flower:        http://localhost:5555
+  MinIO console: http://localhost:9001
+
+COMMON DOCKER COMMANDS
+  docker compose up -d
+  docker compose down
+  docker compose restart backend
+  docker compose ps
+  docker compose logs -f backend
+  docker compose logs -f celery celery_beat
+  docker compose build backend
+  docker compose up -d --build backend
+
+DJANGO
+  docker compose run --rm backend python manage.py migrate
+  docker compose run --rm backend python manage.py makemigrations
+  docker compose run --rm backend python manage.py createsuperuser
+  docker compose run --rm backend python manage.py shell
+  docker compose run --rm backend python manage.py check
+  docker compose run --rm backend python manage.py check --deploy
+  docker compose run --rm backend python manage.py collectstatic --noinput
+
+TESTS
+  docker compose run --rm -e DJANGO_SETTINGS_MODULE=config.settings.testing backend python manage.py test
+  docker compose run --rm -e DJANGO_SETTINGS_MODULE=config.settings.testing backend python manage.py test apps.accounts apps.employees
+
+LOCAL DEVELOPMENT TOOLS (PYTHON 3.13)
+  python -m pip install -r requirements-dev.txt
+  pytest
+  black --check .
+  black .
+  ruff check .
+  ruff check . --fix
+
+CELERY
+  docker compose exec celery celery -A config inspect ping
+  docker compose exec celery celery -A config inspect active
+  docker compose restart celery celery_beat
+
+DATABASE
+  docker compose exec postgres psql -U studio -d studio
+  docker compose exec backend python manage.py dbshell
+
+REDIS
+  docker compose exec redis sh -c 'redis-cli -a "$REDIS_PASSWORD"'
+
+MINIO
+  Open http://localhost:9001 and use MINIO_ROOT_USER and
+  MINIO_ROOT_PASSWORD from .env.
+
+JWT
+  Obtain token:
+    POST http://localhost:8080/api/v1/auth/token/
+    JSON: {"email": "<email>", "password": "<password>"}
+
+  Refresh token:
+    POST http://localhost:8080/api/v1/auth/token/refresh/
+    JSON: {"refresh": "<refresh-token>"}
+
+  Logout:
+    POST http://localhost:8080/api/v1/auth/logout/
+    Header: Authorization: Bearer <access-token>
+    JSON: {"refresh": "<refresh-token>"}
+
+ACCOUNTS
+  Current profile:
+    GET   http://localhost:8080/api/v1/accounts/me/
+    PATCH http://localhost:8080/api/v1/accounts/me/
+
+  Change password:
+    POST http://localhost:8080/api/v1/accounts/me/password/
+
+  User management (admin only):
+    GET    http://localhost:8080/api/v1/accounts/users/
+    POST   http://localhost:8080/api/v1/accounts/users/
+    GET    http://localhost:8080/api/v1/accounts/users/<uuid>/
+    PATCH  http://localhost:8080/api/v1/accounts/users/<uuid>/
+    DELETE http://localhost:8080/api/v1/accounts/users/<uuid>/
+
+EMPLOYEES
+  Positions:
+    GET/POST          http://localhost:8080/api/v1/employees/positions/
+    GET/PATCH/DELETE  http://localhost:8080/api/v1/employees/positions/<uuid>/
+
+  Teams:
+    GET/POST          http://localhost:8080/api/v1/employees/teams/
+    GET/PATCH/DELETE  http://localhost:8080/api/v1/employees/teams/<uuid>/
+
+  Directory:
+    GET/POST          http://localhost:8080/api/v1/employees/
+    GET/PATCH/DELETE  http://localhost:8080/api/v1/employees/<uuid>/
+
+  Notes:
+    - Reads require authentication.
+    - Writes require manager or admin.
+    - DELETE soft-deactivates (position/team/employee).
+    - Employee create accepts user_uuid or email/password/first_name/last_name.
+
+CODE PLACEMENT
+  Writes and workflows: apps/<domain>/services.py
+  Read queries:         apps/<domain>/selectors.py
+  Input validation:     apps/<domain>/serializers.py
+  HTTP handling:        apps/<domain>/api/views.py
+  Background jobs:      apps/<domain>/tasks.py
+  Domain permissions:   apps/<domain>/permissions.py
+  Full guide:           docs/project-structure.md
+
+FULL RESET (DELETES ALL LOCAL DATABASE, REDIS, MINIO, AND STATIC DATA)
+  docker compose down --volumes --remove-orphans
+  ./run.sh
+
+PRODUCTION CHECKLIST
+  - Use config.settings.production.
+  - Replace every development credential and signing key in .env.
+  - Set DEBUG=False and configure the real allowed hosts/origins.
+  - Terminate TLS at the reverse proxy and set SECURE_SSL_REDIRECT=True.
+  - Configure SMTP and enable Sentry only after setting a valid DSN.
+  - Pin image and Python dependency versions through the deployment pipeline.
