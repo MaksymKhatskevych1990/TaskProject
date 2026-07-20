@@ -5,7 +5,7 @@ import time
 from django.core.management.base import BaseCommand, CommandError
 
 from apps.telegram import client, services
-from apps.telegram.exceptions import TelegramDisabledError
+from apps.telegram.exceptions import TelegramAPIError, TelegramDisabledError
 
 
 class Command(BaseCommand):
@@ -22,13 +22,24 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options) -> None:
         offset: int | None = None
-        self.stdout.write(self.style.SUCCESS("Telegram polling started."))
+
+        try:
+            client.delete_webhook()
+            self.stdout.write("Webhook отключён — используется polling.")
+        except (TelegramDisabledError, TelegramAPIError) as exc:
+            raise CommandError(str(exc)) from exc
+
+        self.stdout.write(self.style.SUCCESS("Telegram polling started. Ctrl+C to stop."))
 
         while True:
             try:
                 updates = client.get_updates(offset=offset, timeout=30)
             except TelegramDisabledError as exc:
                 raise CommandError(str(exc)) from exc
+            except TelegramAPIError as exc:
+                self.stderr.write(self.style.WARNING(f"Telegram API error: {exc}"))
+                time.sleep(5)
+                continue
 
             for update in updates:
                 services.process_webhook_update(update=update)
@@ -36,5 +47,3 @@ class Command(BaseCommand):
 
             if options["once"]:
                 break
-            if not updates:
-                time.sleep(1)

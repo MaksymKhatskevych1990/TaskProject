@@ -167,8 +167,17 @@ def process_webhook_update(*, update: dict[str, Any]) -> None:
             chat_id=chat_id,
             text=(
                 "Привет! Чтобы получать задачи, откройте персональную ссылку "
-                "из админки или попросите её у администратора."
+                "из админки (поле «bot link») и нажмите Start.\n\n"
+                f"Ваш chat ID: `{chat_id}`\n"
+                "Его можно вписать в админку вручную, если нужно."
             ),
+        )
+        return
+
+    if text.startswith("/myid"):
+        send_telegram_message(
+            chat_id=chat_id,
+            text=f"Ваш Telegram chat ID: `{chat_id}`",
         )
         return
 
@@ -178,6 +187,7 @@ def process_webhook_update(*, update: dict[str, Any]) -> None:
             text=(
                 "Этот бот отправляет задачи из внутренней системы студии.\n\n"
                 "Для привязки аккаунта используйте ссылку из админки.\n"
+                "Команды: /myid — показать chat ID, /start <ссылка> — привязать аккаунт.\n"
                 "Под задачей есть кнопки «В работе» и «Готово»."
             ),
         )

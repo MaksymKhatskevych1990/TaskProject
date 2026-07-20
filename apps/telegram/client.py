@@ -26,7 +26,12 @@ def _require_enabled() -> str:
     return token
 
 
-def call_method(method: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
+def call_method(
+    method: str,
+    payload: dict[str, Any] | None = None,
+    *,
+    request_timeout: int = 30,
+) -> dict[str, Any]:
     """Call a Telegram Bot API method and return the parsed response body."""
     token = _require_enabled()
     url = f"https://api.telegram.org/bot{token}/{method}"
@@ -38,8 +43,14 @@ def call_method(method: str, payload: dict[str, Any] | None = None) -> dict[str,
         method="POST",
     )
     try:
-        with urllib.request.urlopen(request, timeout=30) as response:
+        with urllib.request.urlopen(request, timeout=request_timeout) as response:
             body = json.loads(response.read().decode("utf-8"))
+    except TimeoutError as exc:
+        logger.debug(
+            "Telegram API request timed out",
+            extra={"method": method, "request_timeout": request_timeout},
+        )
+        raise TelegramAPIError("Telegram API request timed out.") from exc
     except urllib.error.HTTPError as exc:
         error_body = exc.read().decode("utf-8", errors="replace")
         logger.warning(
@@ -115,7 +126,17 @@ def get_updates(*, offset: int | None = None, timeout: int = 30) -> list[dict[st
     payload: dict[str, Any] = {"timeout": timeout}
     if offset is not None:
         payload["offset"] = offset
-    body = call_method("getUpdates", payload)
+    try:
+        body = call_method(
+            "getUpdates",
+            payload,
+            request_timeout=timeout + 15,
+        )
+    except TelegramAPIError as exc:
+        # Long polling often ends with an empty HTTP timeout when no updates arrive.
+        if "timed out" in str(exc).lower():
+            return []
+        raise
     return body.get("result", [])
 
 

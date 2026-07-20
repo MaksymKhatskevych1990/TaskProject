@@ -119,6 +119,18 @@ class TelegramServiceTests(TestCase):
         sent = services.send_telegram_message(chat_id=1, text="hello")
         self.assertFalse(sent)
 
+    @patch("apps.telegram.client.call_method")
+    def test_get_updates_treats_timeout_as_empty_batch(self, mock_call) -> None:
+        """Long polling timeouts should not crash the polling loop."""
+        from apps.telegram import client
+        from apps.telegram.exceptions import TelegramAPIError
+
+        mock_call.side_effect = TelegramAPIError("Telegram API request timed out.")
+
+        updates = client.get_updates(timeout=30)
+
+        self.assertEqual(updates, [])
+
     @patch("apps.telegram.services.link_account_by_token")
     def test_process_webhook_start_command(self, mock_link) -> None:
         """Webhook updates with /start token trigger account linking."""
