@@ -62,12 +62,52 @@ def call_method(method: str, payload: dict[str, Any] | None = None) -> dict[str,
     return body
 
 
-def send_message(*, chat_id: int, text: str, parse_mode: str | None = None) -> dict[str, Any]:
+def send_message(
+    *,
+    chat_id: int,
+    text: str,
+    parse_mode: str | None = None,
+    reply_markup: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Send a text message to a Telegram chat."""
     payload: dict[str, Any] = {"chat_id": chat_id, "text": text}
     if parse_mode:
         payload["parse_mode"] = parse_mode
+    if reply_markup:
+        payload["reply_markup"] = reply_markup
     return call_method("sendMessage", payload)
+
+
+def edit_message_text(
+    *,
+    chat_id: int,
+    message_id: int,
+    text: str,
+    reply_markup: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Edit an existing message and its inline keyboard."""
+    payload: dict[str, Any] = {
+        "chat_id": chat_id,
+        "message_id": message_id,
+        "text": text,
+    }
+    if reply_markup is not None:
+        payload["reply_markup"] = reply_markup
+    return call_method("editMessageText", payload)
+
+
+def answer_callback_query(
+    *,
+    callback_query_id: str,
+    text: str | None = None,
+    show_alert: bool = False,
+) -> dict[str, Any]:
+    """Acknowledge an inline button press."""
+    payload: dict[str, Any] = {"callback_query_id": callback_query_id}
+    if text:
+        payload["text"] = text
+        payload["show_alert"] = show_alert
+    return call_method("answerCallbackQuery", payload)
 
 
 def get_updates(*, offset: int | None = None, timeout: int = 30) -> list[dict[str, Any]]:

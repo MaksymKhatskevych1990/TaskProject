@@ -7,7 +7,9 @@ from django.contrib.auth import get_user_model
 
 from apps.telegram import client
 from apps.telegram.exceptions import TelegramAPIError, TelegramDisabledError
+from apps.telegram.keyboards import build_task_keyboard, parse_task_callback_data
 from apps.telegram.models import TelegramAccount
+from apps.telegram import selectors as telegram_selectors
 
 logger = logging.getLogger(__name__)
 
@@ -64,10 +66,15 @@ def update_telegram_account(
     return account
 
 
-def send_telegram_message(*, chat_id: int, text: str) -> bool:
+def send_telegram_message(
+    *,
+    chat_id: int,
+    text: str,
+    reply_markup: dict[str, Any] | None = None,
+) -> bool:
     """Send a message through the Telegram Bot API."""
     try:
-        client.send_message(chat_id=chat_id, text=text)
+        client.send_message(chat_id=chat_id, text=text, reply_markup=reply_markup)
     except TelegramDisabledError:
         logger.info(
             "Skipped Telegram message because integration is disabled",
@@ -80,11 +87,16 @@ def send_telegram_message(*, chat_id: int, text: str) -> bool:
     return True
 
 
-def queue_telegram_message(*, chat_id: int, text: str) -> None:
+def queue_telegram_message(
+    *,
+    chat_id: int,
+    text: str,
+    reply_markup: dict[str, Any] | None = None,
+) -> None:
     """Enqueue a Telegram message for asynchronous delivery."""
     from apps.telegram.tasks import send_telegram_message_task
 
-    send_telegram_message_task.delay(chat_id, text)
+    send_telegram_message_task.delay(chat_id, text, reply_markup)
 
 
 def link_account_by_token(
@@ -127,6 +139,11 @@ def link_account_by_token(
 
 def process_webhook_update(*, update: dict[str, Any]) -> None:
     """Handle an incoming Telegram update."""
+    callback_query = update.get("callback_query")
+    if callback_query:
+        process_callback_query(callback_query=callback_query)
+        return
+
     message = update.get("message") or update.get("edited_message")
     if not message:
         return
@@ -160,10 +177,99 @@ def process_webhook_update(*, update: dict[str, Any]) -> None:
             chat_id=chat_id,
             text=(
                 "Этот бот отправляет задачи из внутренней системы студии.\n\n"
-                "Для привязки аккаунта используйте ссылку вида "
-                "https://t.me/<bot>?start=<token> из админки."
+                "Для привязки аккаунта используйте ссылку из админки.\n"
+                "Под задачей есть кнопки «В работе» и «Готово»."
             ),
         )
+
+
+def process_callback_query(*, callback_query: dict[str, Any]) -> None:
+    """Handle inline keyboard presses on task notifications."""
+    from apps.tasks import selectors as task_selectors
+    from apps.tasks import services as task_services
+    from apps.tasks.choices import TaskStatus
+    from apps.tasks.models import Task
+
+    callback_id = callback_query.get("id")
+    data = (callback_query.get("data") or "").strip()
+    message = callback_query.get("message") or {}
+    chat = message.get("chat") or {}
+    chat_id = chat.get("id")
+    message_id = message.get("message_id")
+
+    if not callback_id or chat_id is None or message_id is None:
+        return
+
+    parsed = parse_task_callback_data(data)
+    if parsed is None:
+        _answer_callback(callback_id, "Неизвестная команда.")
+        return
+
+    task_uuid, action = parsed
+    status_map = {
+        "in_progress": TaskStatus.IN_PROGRESS,
+        "done": TaskStatus.DONE,
+    }
+    new_status = status_map.get(action)
+    if new_status is None:
+        _answer_callback(callback_id, "Действие недоступно.")
+        return
+
+    account = telegram_selectors.get_telegram_account_by_chat_id(chat_id=chat_id)
+    if account is None:
+        _answer_callback(callback_id, "Сначала привяжите аккаунт через /start.")
+        return
+
+    try:
+        task = task_selectors.get_task_by_uuid(task_uuid)
+    except Task.DoesNotExist:
+        _answer_callback(callback_id, "Задача не найдена.")
+        return
+
+    if task.assignee_id != account.user_id:
+        _answer_callback(callback_id, "Эта задача назначена другому пользователю.")
+        return
+
+    if task.status in {TaskStatus.DONE, TaskStatus.CANCELLED}:
+        _answer_callback(callback_id, "Задача уже закрыта.")
+        return
+
+    if task.status == TaskStatus.IN_PROGRESS and action == "in_progress":
+        _answer_callback(callback_id, "Задача уже в работе.")
+        return
+
+    updated_task = task_services.update_task_status(
+        task=task,
+        status=new_status,
+        actor=account.user,
+    )
+    text = format_task_notification(task=updated_task)
+    keyboard = build_task_keyboard(updated_task)
+    markup = keyboard if keyboard is not None else {"inline_keyboard": []}
+
+    try:
+        client.edit_message_text(
+            chat_id=chat_id,
+            message_id=message_id,
+            text=text,
+            reply_markup=markup,
+        )
+    except TelegramDisabledError:
+        logger.info("Skipped Telegram message edit because integration is disabled")
+    except TelegramAPIError:
+        logger.exception("Failed to edit Telegram task message")
+
+    _answer_callback(callback_id, f"Статус: {updated_task.get_status_display()}")
+
+
+def _answer_callback(callback_id: str, text: str) -> None:
+    """Send a toast response for an inline button press."""
+    try:
+        client.answer_callback_query(callback_query_id=callback_id, text=text)
+    except TelegramDisabledError:
+        return
+    except TelegramAPIError:
+        logger.exception("Failed to answer Telegram callback query")
 
 
 def format_task_notification(*, task: Any) -> str:
@@ -194,5 +300,6 @@ def notify_user_about_task(*, user: User, task: Any) -> bool:
         return False
 
     text = format_task_notification(task=task)
-    queue_telegram_message(chat_id=account.chat_id, text=text)
+    keyboard = build_task_keyboard(task)
+    queue_telegram_message(chat_id=account.chat_id, text=text, reply_markup=keyboard)
     return True

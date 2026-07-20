@@ -13,6 +13,15 @@ def get_telegram_account_for_user(*, user: User) -> TelegramAccount | None:
     return TelegramAccount.objects.filter(user=user).first()
 
 
+def get_telegram_account_by_chat_id(*, chat_id: int) -> TelegramAccount | None:
+    """Return the Telegram account linked to a chat, if any."""
+    return (
+        TelegramAccount.objects.select_related("user")
+        .filter(chat_id=chat_id)
+        .first()
+    )
+
+
 def list_notification_ready_accounts() -> QuerySet[TelegramAccount]:
     """Return accounts that can receive Telegram task notifications."""
     return TelegramAccount.objects.filter(

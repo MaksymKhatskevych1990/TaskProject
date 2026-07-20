@@ -50,6 +50,58 @@ class TelegramServiceTests(TestCase):
         self.assertTrue(sent)
         mock_queue.assert_called_once()
         self.assertIn(task.title, mock_queue.call_args.kwargs["text"])
+        self.assertIn("inline_keyboard", mock_queue.call_args.kwargs["reply_markup"])
+
+    @patch("apps.telegram.services.client.edit_message_text")
+    @patch("apps.telegram.services.client.answer_callback_query")
+    def test_process_callback_query_marks_task_done(
+        self,
+        mock_answer,
+        mock_edit,
+    ) -> None:
+        """Assignee can mark a task as done from Telegram buttons."""
+        user = UserFactory()
+        account = user.telegram_account
+        account.chat_id = 555001
+        account.save(update_fields=["chat_id"])
+        task = TaskFactory(assignee=user, status="todo")
+        callback_data = f"task:{task.uuid}:done"
+
+        services.process_callback_query(
+            callback_query={
+                "id": "cb-1",
+                "data": callback_data,
+                "message": {"chat": {"id": 555001}, "message_id": 77},
+            }
+        )
+
+        task.refresh_from_db()
+        self.assertEqual(task.status, "done")
+        mock_edit.assert_called_once()
+        mock_answer.assert_called_once()
+
+    @patch("apps.telegram.services.client.answer_callback_query")
+    def test_process_callback_query_rejects_other_assignee(self, mock_answer) -> None:
+        """Users cannot change tasks assigned to someone else."""
+        assignee = UserFactory()
+        other = UserFactory()
+        account = other.telegram_account
+        account.chat_id = 555002
+        account.save(update_fields=["chat_id"])
+        task = TaskFactory(assignee=assignee, status="todo")
+
+        services.process_callback_query(
+            callback_query={
+                "id": "cb-2",
+                "data": f"task:{task.uuid}:done",
+                "message": {"chat": {"id": 555002}, "message_id": 88},
+            }
+        )
+
+        task.refresh_from_db()
+        self.assertEqual(task.status, "todo")
+        mock_answer.assert_called_once()
+        self.assertIn("другому", mock_answer.call_args.kwargs["text"])
 
     def test_format_task_notification_in_russian(self) -> None:
         """Task messages include title and status labels."""

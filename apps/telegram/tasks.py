@@ -1,6 +1,7 @@
 """Celery tasks for Telegram delivery."""
 
 import logging
+from typing import Any
 
 from celery import shared_task
 
@@ -16,10 +17,19 @@ logger = logging.getLogger(__name__)
     retry_backoff=True,
     retry_kwargs={"max_retries": 3},
 )
-def send_telegram_message_task(self, chat_id: int, text: str) -> bool:
+def send_telegram_message_task(
+    self,
+    chat_id: int,
+    text: str,
+    reply_markup: dict[str, Any] | None = None,
+) -> bool:
     """Deliver a Telegram message asynchronously."""
     try:
-        return send_telegram_message(chat_id=chat_id, text=text)
+        return send_telegram_message(
+            chat_id=chat_id,
+            text=text,
+            reply_markup=reply_markup,
+        )
     except TelegramDisabledError:
         logger.info(
             "Skipped async Telegram message because integration is disabled",

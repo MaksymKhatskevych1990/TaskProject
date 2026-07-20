@@ -84,6 +84,21 @@ def update_task(
     return task
 
 
+def update_task_status(
+    *,
+    task: Task,
+    status: str,
+    actor: User,
+) -> Task:
+    """Update only the task status."""
+    return update_task(
+        task=task,
+        data={"status": status},
+        actor=actor,
+        notify_on_reassign=False,
+    )
+
+
 def assign_task(
     *,
     task: Task,
