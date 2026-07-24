@@ -91,12 +91,24 @@ def update_task_status(
     actor: User,
 ) -> Task:
     """Update only the task status."""
-    return update_task(
+    previous_status = task.status
+    updated = update_task(
         task=task,
         data={"status": status},
         actor=actor,
         notify_on_reassign=False,
     )
+    if previous_status != updated.status:
+        logger.info(
+            "Task status changed",
+            extra={
+                "task_uuid": str(updated.uuid),
+                "previous_status": previous_status,
+                "status": updated.status,
+                "actor_uuid": str(actor.uuid),
+            },
+        )
+    return updated
 
 
 def assign_task(

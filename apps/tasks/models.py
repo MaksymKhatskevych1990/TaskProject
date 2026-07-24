@@ -11,6 +11,14 @@ from apps.tasks.choices import TaskStatus
 class Task(BaseModel):
     """Work item assigned to a studio member."""
 
+    project = models.ForeignKey(
+        "projects.Project",
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="tasks",
+        verbose_name=_("проект"),
+    )
     title = models.CharField(_("название"), max_length=200)
     description = models.TextField(_("описание"), blank=True)
     assignee = models.ForeignKey(

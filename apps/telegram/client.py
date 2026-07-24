@@ -153,8 +153,42 @@ def delete_webhook() -> dict[str, Any]:
     return call_method("deleteWebhook", {"drop_pending_updates": False})
 
 
-def build_bot_deeplink(*, start_parameter: str) -> str:
-    """Build a t.me link that opens the bot with a /start payload."""
-    username = settings.TELEGRAM_BOT_USERNAME.lstrip("@")
-    encoded = urllib.parse.quote(start_parameter)
-    return f"https://t.me/{username}?start={encoded}"
+def set_my_commands(*, commands: list[dict[str, str]]) -> dict[str, Any]:
+    """Register bot commands shown in the Telegram menu button."""
+    return call_method("setMyCommands", {"commands": commands})
+
+
+def get_file(*, file_id: str) -> dict[str, Any]:
+    """Return metadata for a Telegram file."""
+    body = call_method("getFile", {"file_id": file_id})
+    return body.get("result", {})
+
+
+def download_file(*, file_path: str, request_timeout: int = 60) -> bytes:
+    """Download a file from Telegram servers."""
+    token = _require_enabled()
+    url = f"https://api.telegram.org/file/bot{token}/{file_path}"
+    request = urllib.request.Request(url, method="GET")
+    try:
+        with urllib.request.urlopen(request, timeout=request_timeout) as response:
+            return response.read()
+    except TimeoutError as exc:
+        raise TelegramAPIError("Telegram file download timed out.") from exc
+    except urllib.error.HTTPError as exc:
+        error_body = exc.read().decode("utf-8", errors="replace")
+        raise TelegramAPIError(error_body or str(exc), status_code=exc.code) from exc
+    except urllib.error.URLError as exc:
+        raise TelegramAPIError(str(exc)) from exc
+
+
+def send_document(
+    *,
+    chat_id: int,
+    document_url: str,
+    caption: str | None = None,
+) -> dict[str, Any]:
+    """Send a document to a Telegram chat by URL."""
+    payload: dict[str, Any] = {"chat_id": chat_id, "document": document_url}
+    if caption:
+        payload["caption"] = caption
+    return call_method("sendDocument", payload)

@@ -169,6 +169,17 @@ services:
       redis:
         condition: service_healthy
 
+  telegram_bot:
+    <<: *django-service
+    command: ["/app/docker/telegram_poll.sh"]
+    depends_on:
+      backend:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   nginx:
     image: nginx:1.27-alpine
     volumes:

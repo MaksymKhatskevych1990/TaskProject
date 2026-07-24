@@ -25,6 +25,15 @@ class Command(BaseCommand):
 
         try:
             client.delete_webhook()
+            client.set_my_commands(
+                commands=[
+                    {"command": "tasks", "description": "Мои задачи"},
+                    {"command": "dialogs", "description": "Диалоги"},
+                    {"command": "stop", "description": "Завершить диалог"},
+                    {"command": "myid", "description": "Показать chat ID"},
+                    {"command": "help", "description": "Справка"},
+                ]
+            )
             self.stdout.write("Webhook отключён — используется polling.")
         except (TelegramDisabledError, TelegramAPIError) as exc:
             raise CommandError(str(exc)) from exc

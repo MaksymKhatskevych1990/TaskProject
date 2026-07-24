@@ -15,7 +15,7 @@ RUN pip install --upgrade pip \
     && pip install -r /app/requirements.txt
 
 COPY --chown=django:django . /app
-RUN chmod +x /app/docker/entrypoint.sh \
+RUN chmod +x /app/docker/entrypoint.sh /app/docker/telegram_poll.sh \
     && mkdir -p /app/staticfiles \
     && chown -R django:django /app/staticfiles
 

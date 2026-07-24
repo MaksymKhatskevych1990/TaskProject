@@ -9,7 +9,6 @@ FUTURE_APPLICATIONS = (
     "projects",
     "notifications",
     "comments",
-    "files",
     "dashboard",
     "clients",
     "website",
@@ -17,7 +16,7 @@ FUTURE_APPLICATIONS = (
     "ai",
 )
 
-IMPLEMENTED_APPLICATIONS = ("accounts", "employees", "telegram", "tasks")
+IMPLEMENTED_APPLICATIONS = ("accounts", "employees", "telegram", "tasks", "files")
 
 
 class ApplicationBoundaryTests(SimpleTestCase):

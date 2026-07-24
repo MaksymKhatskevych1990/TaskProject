@@ -1,0 +1,139 @@
+{% load i18n %}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h4 class="mb-3">{% trans "Обзор студии" %}</h4>
+    </div>
+
+    {% for item in studio_dashboard.status_summaries %}
+        <div class="col-xl-3 col-md-6 col-12">
+            <div class="info-box shadow-sm mb-3">
+                <span class="info-box-icon bg-{{ item.color }} elevation-1">
+                    <i class="fas fa-tasks"></i>
+                </span>
+                <div class="info-box-content">
+                    <span class="info-box-text">{{ item.label }}</span>
+                    <span class="info-box-number">
+                        <a href="{{ item.admin_url }}" class="text-dark">{{ item.count }}</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 col-12">
+        <div class="card card-outline card-danger shadow-sm">
+            <div class="card-header">
+                <h5 class="card-title m-0">
+                    <i class="fas fa-clock mr-1"></i>
+                    {% trans "Просроченные задачи" %}
+                    <span class="badge badge-danger ml-2">{{ studio_dashboard.overdue_count }}</span>
+                </h5>
+                <div class="card-tools">
+                    <a href="{{ studio_dashboard.overdue_admin_url }}" class="btn btn-tool">
+                        {% trans "Все" %}
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if studio_dashboard.overdue_tasks %}
+                    <table class="table table-sm table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Задача" %}</th>
+                                <th>{% trans "Исполнитель" %}</th>
+                                <th>{% trans "Срок" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in studio_dashboard.overdue_tasks %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'admin:tasks_task_change' task.pk %}">
+                                            {{ task.title }}
+                                        </a>
+                                    </td>
+                                    <td>{{ task.assignee.email }}</td>
+                                    <td>{{ task.due_date|date:"d.m.Y" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="p-3 mb-0 text-muted">{% trans "Просроченных задач нет." %}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 col-12">
+        <div class="card card-outline card-warning shadow-sm">
+            <div class="card-header">
+                <h5 class="card-title m-0">
+                    <i class="fab fa-telegram mr-1"></i>
+                    {% trans "Без Telegram" %}
+                    <span class="badge badge-warning ml-2">
+                        {{ studio_dashboard.users_without_telegram_count }}
+                    </span>
+                </h5>
+                <div class="card-tools">
+                    <a href="{{ studio_dashboard.users_admin_url }}" class="btn btn-tool">
+                        {% trans "Пользователи" %}
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if studio_dashboard.users_without_telegram %}
+                    <table class="table table-sm table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>{% trans "Email" %}</th>
+                                <th>{% trans "Имя" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in studio_dashboard.users_without_telegram %}
+                                <tr>
+                                    <td>
+                                        <a href="{% url 'admin:accounts_user_change' user.pk %}">
+                                            {{ user.email }}
+                                        </a>
+                                    </td>
+                                    <td>{{ user.get_full_name|default:"—" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="p-3 mb-0 text-muted">
+                        {% trans "У всех активных пользователей Telegram привязан." %}
+                    </p>
+                {% endif %}
+            </div>
+            {% if studio_dashboard.users_without_telegram_count %}
+                <div class="card-footer text-muted">
+                    <a href="{{ studio_dashboard.telegram_admin_url }}">
+                        {% trans "Открыть Telegram аккаунты" %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="callout callout-info shadow-sm mb-0">
+            <p class="mb-0">
+                {% blocktrans with total=studio_dashboard.total_tasks %}
+                Всего задач в системе: <strong>{{ total }}</strong>.
+                {% endblocktrans %}
+                <a href="{% url 'admin:tasks_task_changelist' %}">{% trans "Открыть задачи" %}</a>
+                ·
+                <a href="{% url 'admin:tasks_task_add' %}">{% trans "Создать задачу" %}</a>
+            </p>
+        </div>
+    </div>
+</div>

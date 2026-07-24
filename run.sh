@@ -42,6 +42,9 @@ docker compose run --rm minio_setup
 echo "Applying database migrations..."
 docker compose run --rm --no-deps backend python manage.py migrate --noinput
 
+echo "Registering Celery Beat schedules..."
+docker compose run --rm --no-deps backend python manage.py setup_beat_schedule
+
 echo "Collecting static assets..."
 docker compose run --rm --no-deps backend python manage.py collectstatic --noinput
 
@@ -72,6 +75,7 @@ for attempt in {1..60}; do
         echo "Admin:          http://localhost:${HTTP_ADDRESS##*:}/admin/"
         echo "Flower:         http://localhost:${FLOWER_ADDRESS##*:}"
         echo "MinIO console:  http://localhost:${MINIO_ADDRESS##*:}"
+        echo "Telegram bot:   docker compose logs -f telegram_bot"
         exit 0
     fi
     sleep 2

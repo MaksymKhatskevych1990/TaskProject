@@ -113,6 +113,41 @@ class TelegramServiceTests(TestCase):
         self.assertIn("Новая задача", message)
         self.assertIn("Статус:", message)
 
+    def test_format_task_notification_reflects_done_status(self) -> None:
+        """Completed tasks use a different message header."""
+        task = TaskFactory(title="Deploy release", status="done")
+
+        message = services.format_task_notification(task=task)
+
+        self.assertIn("выполнена", message.lower())
+        self.assertIn("Выполнена", message)
+
+    @patch("apps.telegram.services.client.edit_message_text")
+    @patch("apps.telegram.services.client.answer_callback_query")
+    def test_process_callback_query_marks_task_in_progress(
+        self,
+        mock_answer,
+        mock_edit,
+    ) -> None:
+        """Assignee can mark a task as in progress from Telegram buttons."""
+        user = UserFactory()
+        account = user.telegram_account
+        account.chat_id = 555003
+        account.save(update_fields=["chat_id"])
+        task = TaskFactory(assignee=user, status="todo")
+
+        services.process_callback_query(
+            callback_query={
+                "id": "cb-3",
+                "data": f"task:{task.uuid}:in_progress",
+                "message": {"chat": {"id": 555003}, "message_id": 78},
+            }
+        )
+
+        task.refresh_from_db()
+        self.assertEqual(task.status, "in_progress")
+        self.assertIn("В работе", mock_edit.call_args.kwargs["text"])
+
     @override_settings(TELEGRAM_ENABLED=False, TELEGRAM_BOT_TOKEN="")
     def test_send_telegram_message_skips_when_disabled(self) -> None:
         """Disabled integration does not call the Telegram API."""
@@ -149,3 +184,92 @@ class TelegramServiceTests(TestCase):
             chat_id=42,
             username="worker",
         )
+
+    @patch("apps.telegram.services.show_task_history")
+    def test_process_webhook_tasks_menu_button(self, mock_history) -> None:
+        """The reply keyboard button opens the task history."""
+        user = UserFactory()
+        account = user.telegram_account
+        account.chat_id = 777001
+        account.save(update_fields=["chat_id"])
+
+        services.process_webhook_update(
+            update={
+                "message": {
+                    "text": "📋 Мои задачи",
+                    "chat": {"id": 777001},
+                    "from": {"id": 777001},
+                }
+            }
+        )
+
+        mock_history.assert_called_once()
+        self.assertEqual(mock_history.call_args.kwargs["account"].user_id, user.id)
+
+    @patch("apps.telegram.services.client.edit_message_text")
+    @patch("apps.telegram.services.client.answer_callback_query")
+    def test_process_history_callback_opens_task_detail(
+        self,
+        mock_answer,
+        mock_edit,
+    ) -> None:
+        """History list buttons open a detailed task card."""
+        user = UserFactory()
+        account = user.telegram_account
+        account.chat_id = 777002
+        account.save(update_fields=["chat_id"])
+        task = TaskFactory(
+            assignee=user,
+            title="History task",
+            description="Do the thing",
+            status="done",
+        )
+
+        services.process_history_callback(
+            callback_id="cb-history",
+            chat_id=777002,
+            message_id=100,
+            callback_query={"from": {"id": 777002}},
+            payload={
+                "kind": "view",
+                "page": 0,
+                "task_uuid": task.uuid,
+            },
+        )
+
+        mock_edit.assert_called_once()
+        self.assertIn("History task", mock_edit.call_args.kwargs["text"])
+        self.assertIn("Do the thing", mock_edit.call_args.kwargs["text"])
+        self.assertIn("Выполнена", mock_edit.call_args.kwargs["text"])
+
+    @patch("apps.telegram.services.client.edit_message_text")
+    @patch("apps.telegram.services.client.answer_callback_query")
+    def test_process_history_callback_updates_task_status(
+        self,
+        mock_answer,
+        mock_edit,
+    ) -> None:
+        """Task status can be changed from the history detail view."""
+        user = UserFactory()
+        account = user.telegram_account
+        account.chat_id = 777003
+        account.save(update_fields=["chat_id"])
+        task = TaskFactory(assignee=user, status="todo")
+
+        services.process_history_callback(
+            callback_id="cb-history-action",
+            chat_id=777003,
+            message_id=101,
+            callback_query={"from": {"id": 777003}},
+            payload={
+                "kind": "action",
+                "page": 0,
+                "task_uuid": task.uuid,
+                "action": "done",
+            },
+        )
+
+        task.refresh_from_db()
+        self.assertEqual(task.status, "done")
+        mock_edit.assert_called_once()
+        self.assertIn("Выполнена", mock_edit.call_args.kwargs["text"])
