@@ -12,7 +12,23 @@ docker compose run --rm backend python manage.py createsuperuser
 ```
 
 The application is available at <http://localhost:8080> and the administration
-site at <http://localhost:8080/admin/>.
+site at <http://localhost:8080/admin/>. The public landing page is served at
+the root URL.
+
+## Frontend
+
+The marketing site lives in `frontend/` (Next.js, React, TypeScript, Tailwind).
+
+Local development:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The dev server runs at <http://localhost:3000>. In Docker, Nginx routes `/` to
+the frontend and `/api/`, `/admin/`, `/health/` to Django.
 
 ## API
 

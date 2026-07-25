@@ -180,6 +180,24 @@ services:
       redis:
         condition: service_healthy
 
+  frontend:
+    build:
+      context: ./frontend
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-qO-",
+          "http://localhost:3000/",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
   nginx:
     image: nginx:1.27-alpine
     volumes:
@@ -189,6 +207,8 @@ services:
       - "${HTTP_PORT:-8080}:80"
     depends_on:
       backend:
+        condition: service_healthy
+      frontend:
         condition: service_healthy
     restart: unless-stopped
 

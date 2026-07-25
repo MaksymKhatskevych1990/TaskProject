@@ -72,6 +72,7 @@ for attempt in {1..60}; do
         MINIO_ADDRESS="$(docker compose port minio 9001)"
         echo
         echo "Studio is ready: http://localhost:${HTTP_ADDRESS##*:}"
+        echo "Landing page:   http://localhost:${HTTP_ADDRESS##*:}/"
         echo "Admin:          http://localhost:${HTTP_ADDRESS##*:}/admin/"
         echo "Flower:         http://localhost:${FLOWER_ADDRESS##*:}"
         echo "MinIO console:  http://localhost:${MINIO_ADDRESS##*:}"
