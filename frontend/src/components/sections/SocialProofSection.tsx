@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { STATS, TESTIMONIALS } from "@/lib/site-data";
 
 function AnimatedCounter({
@@ -59,25 +60,25 @@ export function SocialProofSection() {
   return (
     <section className="relative py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
-          {STATS.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <AnimatedCounter
-                value={stat.value}
-                suffix={stat.suffix}
-                decimals={"decimals" in stat ? stat.decimals : 0}
-              />
-              <p className="mt-2 text-sm text-muted">{stat.label}</p>
-            </div>
-          ))}
-        </div>
+        <RevealOnScroll>
+          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+            {STATS.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <AnimatedCounter
+                  value={stat.value}
+                  suffix={stat.suffix}
+                  decimals={"decimals" in stat ? stat.decimals : 0}
+                />
+                <p className="mt-2 text-sm text-muted">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </RevealOnScroll>
 
         <div className="mt-16 grid gap-6 md:grid-cols-3">
-          {TESTIMONIALS.map((item) => (
-            <article
-              key={item.name}
-              className="rounded-2xl border border-white/5 bg-card p-6 transition-colors hover:border-white/10"
-            >
+          {TESTIMONIALS.map((item, index) => (
+            <RevealOnScroll key={item.name} delayMs={index * 100}>
+              <article className="h-full rounded-2xl border border-white/5 bg-card p-6 transition-colors hover:border-white/10">
               <div className="mb-3 text-amber-400">
                 {"★".repeat(item.rating)}
               </div>
@@ -89,6 +90,7 @@ export function SocialProofSection() {
                 <p className="text-xs text-muted">{item.role}</p>
               </div>
             </article>
+            </RevealOnScroll>
           ))}
         </div>
       </div>
