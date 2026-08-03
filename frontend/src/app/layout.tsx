@@ -21,9 +21,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Devcraft — IT-студия | Сайты, магазины, Telegram-боты",
+  title: "Devcraft — IT-студія | Сайти, магазини, Telegram-боти",
   description:
-    "Запустим ваш бизнес онлайн за 14 дней. Сайты, интернет-магазины, Telegram-боты и автоматизация под ключ.",
+    "Запустимо ваш бізнес онлайн за 14 днів. Сайти, інтернет-магазини, Telegram-боти та автоматизація під ключ.",
 };
 
 export default function RootLayout({

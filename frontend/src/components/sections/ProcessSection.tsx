@@ -1,4 +1,4 @@
-import { PROCESS_STEPS } from "@/lib/site-data";
+import { PROCESS_STEPS, SECTIONS } from "@/lib/site-data";
 
 export function ProcessSection() {
   return (
@@ -6,10 +6,10 @@ export function ProcessSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
           <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-            Процесс
+            {SECTIONS.process.eyebrow}
           </p>
           <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
-            Как мы работаем
+            {SECTIONS.process.title}
           </h2>
         </div>
 

@@ -36,15 +36,15 @@ function BrowserMockup() {
               🤖
             </span>
             <span className="font-[family-name:var(--font-jetbrains)] text-[10px] text-cyan">
-              AI-бот
+              {HERO.mockup.botLabel}
             </span>
           </div>
           <div className="space-y-1.5">
             <div className="rounded-lg rounded-bl-none bg-cyan/10 px-2 py-1 text-[10px]">
-              Здравствуйте! Чем помочь?
+              {HERO.mockup.botGreeting}
             </div>
             <div className="ml-auto w-fit rounded-lg rounded-br-none bg-violet/20 px-2 py-1 text-[10px]">
-              Хочу сайт
+              {HERO.mockup.userMessage}
             </div>
           </div>
         </div>
@@ -93,7 +93,7 @@ export function HeroSection() {
               {HERO.primaryCta}
             </a>
             <a
-              href="#cases"
+              href="#portfolio"
               className="rounded-full border border-white/10 px-6 py-3 text-sm font-medium transition-colors hover:border-white/20 hover:bg-white/5"
             >
               {HERO.secondaryCta}

@@ -74,6 +74,7 @@ for attempt in {1..60}; do
         echo "Studio is ready: http://localhost:${HTTP_ADDRESS##*:}"
         echo "Landing page:   http://localhost:${HTTP_ADDRESS##*:}/"
         echo "Admin:          http://localhost:${HTTP_ADDRESS##*:}/admin/"
+        echo "Note: use port ${HTTP_ADDRESS##*:} (nginx). Direct :8000 is not exposed."
         echo "Flower:         http://localhost:${FLOWER_ADDRESS##*:}"
         echo "MinIO console:  http://localhost:${MINIO_ADDRESS##*:}"
         echo "Telegram bot:   docker compose logs -f telegram_bot"

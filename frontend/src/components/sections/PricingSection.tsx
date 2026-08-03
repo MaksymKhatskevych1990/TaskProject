@@ -1,4 +1,4 @@
-import { formatPrice, PRICING_PLANS } from "@/lib/site-data";
+import { formatPrice, PRICING_PLANS, SECTIONS } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
 export function PricingSection() {
@@ -7,13 +7,13 @@ export function PricingSection() {
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mb-12 text-center">
           <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-            Цены
+            {SECTIONS.pricing.eyebrow}
           </p>
           <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
-            Прозрачные тарифы
+            {SECTIONS.pricing.title}
           </h2>
           <p className="mx-auto mt-3 max-w-lg text-sm text-muted">
-            Все цены указаны в гривнах. Фиксируем стоимость в договоре.
+            {SECTIONS.pricing.subtitle}
           </p>
         </div>
 
@@ -40,7 +40,7 @@ export function PricingSection() {
               <p className="mt-1 text-sm text-muted">{plan.description}</p>
 
               <div className="mt-6">
-                <span className="text-sm text-muted">от </span>
+                <span className="text-sm text-muted">{SECTIONS.pricing.from} </span>
                 <span className="font-[family-name:var(--font-exo2)] text-3xl font-bold">
                   {formatPrice(plan.price)}
                 </span>
@@ -59,7 +59,7 @@ export function PricingSection() {
               </ul>
 
               <a
-                href="#contact"
+                href={`?plan=${plan.slug}#contact`}
                 className={cn(
                   "mt-8 block rounded-full py-3 text-center text-sm font-semibold transition-opacity hover:opacity-90",
                   plan.highlighted
@@ -67,7 +67,7 @@ export function PricingSection() {
                     : "border border-white/10 hover:bg-white/5",
                 )}
               >
-                Выбрать тариф
+                {SECTIONS.pricing.choosePlan}
               </a>
             </article>
           ))}

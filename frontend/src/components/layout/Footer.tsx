@@ -1,4 +1,5 @@
-import { SITE } from "@/lib/site-data";
+import Link from "next/link";
+import { FOOTER, SITE } from "@/lib/site-data";
 
 export function Footer() {
   return (
@@ -13,16 +14,24 @@ export function Footer() {
           </span>
         </div>
         <p className="text-sm text-muted">
-          © {new Date().getFullYear()} {SITE.brand}. Все права защищены.
+          © {new Date().getFullYear()} {SITE.brand}. {FOOTER.rights}
         </p>
-        <a
-          href={SITE.telegramUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-cyan transition-opacity hover:opacity-80"
-        >
-          Telegram
-        </a>
+        <div className="flex items-center gap-6">
+          <Link
+            href="/blog"
+            className="text-sm text-muted transition-colors hover:text-foreground"
+          >
+            {FOOTER.blog}
+          </Link>
+          <a
+            href={SITE.telegramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-cyan transition-opacity hover:opacity-80"
+          >
+            {FOOTER.telegram}
+          </a>
+        </div>
       </div>
     </footer>
   );

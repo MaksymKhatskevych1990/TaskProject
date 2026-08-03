@@ -6,28 +6,54 @@ import { FAQSection } from "@/components/sections/FAQSection";
 import { FloatingTelegramButton } from "@/components/sections/FloatingTelegramButton";
 import { GuaranteesSection } from "@/components/sections/GuaranteesSection";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { PortfolioSection } from "@/components/sections/PortfolioSection";
 import { PricingSection } from "@/components/sections/PricingSection";
 import { ProcessSection } from "@/components/sections/ProcessSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { SocialProofSection } from "@/components/sections/SocialProofSection";
+import { SectionScrollSnap } from "@/components/ui/SectionScrollSnap";
+import { SnapSection } from "@/components/ui/SnapSection";
 
 export default function HomePage() {
   return (
-    <>
+    <SectionScrollSnap>
       <Header />
       <main>
-        <HeroSection />
-        <SocialProofSection />
-        <ServicesSection />
-        <CaseStudiesSection />
-        <ProcessSection />
-        <PricingSection />
-        <GuaranteesSection />
-        <FAQSection />
-        <ContactSection />
+        <SnapSection>
+          <HeroSection />
+        </SnapSection>
+        <SnapSection>
+          <SocialProofSection />
+        </SnapSection>
+        <SnapSection>
+          <ServicesSection />
+        </SnapSection>
+        <SnapSection>
+          <PortfolioSection />
+        </SnapSection>
+        <SnapSection>
+          <CaseStudiesSection />
+        </SnapSection>
+        <SnapSection>
+          <ProcessSection />
+        </SnapSection>
+        <SnapSection>
+          <PricingSection />
+        </SnapSection>
+        <SnapSection>
+          <GuaranteesSection />
+        </SnapSection>
+        <SnapSection>
+          <FAQSection />
+        </SnapSection>
+        <SnapSection>
+          <ContactSection />
+        </SnapSection>
       </main>
-      <Footer />
+      <SnapSection>
+        <Footer />
+      </SnapSection>
       <FloatingTelegramButton />
-    </>
+    </SectionScrollSnap>
   );
 }

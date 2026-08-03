@@ -11,12 +11,18 @@ FUTURE_APPLICATIONS = (
     "comments",
     "dashboard",
     "clients",
-    "website",
     "crm",
     "ai",
 )
 
-IMPLEMENTED_APPLICATIONS = ("accounts", "employees", "telegram", "tasks", "files")
+IMPLEMENTED_APPLICATIONS = (
+    "accounts",
+    "employees",
+    "telegram",
+    "tasks",
+    "files",
+    "website",
+)
 
 
 class ApplicationBoundaryTests(SimpleTestCase):

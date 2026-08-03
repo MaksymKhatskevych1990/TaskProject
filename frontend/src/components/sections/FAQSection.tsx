@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FAQ_ITEMS } from "@/lib/site-data";
+import { FAQ_ITEMS, SECTIONS } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
 export function FAQSection() {
@@ -12,10 +12,10 @@ export function FAQSection() {
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <div className="mb-12 text-center">
           <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-            FAQ
+            {SECTIONS.faq.eyebrow}
           </p>
           <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
-            Частые вопросы
+            {SECTIONS.faq.title}
           </h2>
         </div>
 

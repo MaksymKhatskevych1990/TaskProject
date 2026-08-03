@@ -212,6 +212,23 @@ JAZZMIN_SETTINGS = {
     "show_ui_builder": False,
     "navigation_expanded": True,
     "language_chooser": False,
+    "order_with_respect_to": [
+        "accounts",
+        "employees",
+        "projects",
+        "tasks",
+        "comments",
+        "files",
+        "telegram",
+        "django_celery_beat",
+        "token_blacklist",
+        "website",
+    ],
+    "icons": {
+        "website.blogcategory": "fas fa-tags",
+        "website.blogpost": "fas fa-newspaper",
+        "website.contactlead": "fas fa-envelope",
+    },
 }
 
 LOG_LEVEL = env("LOG_LEVEL", default="INFO")

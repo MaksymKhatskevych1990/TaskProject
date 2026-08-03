@@ -183,6 +183,10 @@ services:
   frontend:
     build:
       context: ./frontend
+      args:
+        API_URL: http://backend:8000
+    environment:
+      API_URL: http://backend:8000
     restart: unless-stopped
     init: true
     healthcheck:
