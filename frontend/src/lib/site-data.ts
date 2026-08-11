@@ -69,6 +69,10 @@ export const HERO = {
     botGreeting: "Вітаємо! Чим допомогти?",
     userMessage: "Хочу сайт",
   },
+  chameleon: {
+    ariaLabel: "Chameleon Digital Studio — наведи курсор, щоб хамелеон хвилювався",
+    dontDistract: "Не відволікай!",
+  },
 } as const;
 
 export const STATS = [

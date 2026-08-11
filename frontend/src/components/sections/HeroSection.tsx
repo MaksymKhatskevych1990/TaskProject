@@ -9,6 +9,22 @@ import { cn } from "@/lib/utils";
 const NORMAL_PLAYBACK_RATE = 1;
 const NERVOUS_PLAYBACK_RATE = 1.85;
 
+function ChameleonPaw({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 32 40"
+      aria-hidden="true"
+      className={cn("h-10 w-8 drop-shadow-md", className)}
+    >
+      <ellipse cx="16" cy="28" rx="10" ry="8" fill="#5eead4" />
+      <circle cx="8" cy="36" r="3.5" fill="#2dd4bf" />
+      <circle cx="16" cy="38" r="3.5" fill="#2dd4bf" />
+      <circle cx="24" cy="36" r="3.5" fill="#2dd4bf" />
+      <ellipse cx="16" cy="14" rx="7" ry="9" fill="#99f6e4" />
+    </svg>
+  );
+}
+
 function HeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [nervous, setNervous] = useState(false);
@@ -48,11 +64,11 @@ function HeroVideo() {
           onTouchCancel={handlePointerLeave}
           tabIndex={0}
           role="img"
-          aria-label="Chameleon Digital Studio — наведи курсор, щоб хameleon хвилювався"
+          aria-label={HERO.chameleon.ariaLabel}
         >
           <div
             className={cn(
-              "overflow-hidden rounded-2xl border bg-[#0d1224] shadow-2xl transition-colors duration-200",
+              "relative overflow-hidden rounded-2xl border bg-[#0d1224] shadow-2xl transition-colors duration-200",
               nervous
                 ? "animate-nervous-shake animate-nervous-glow border-orange-400/50"
                 : "border-white/10 shadow-cyan/10 ring-1 ring-cyan/10",
@@ -72,6 +88,23 @@ function HeroVideo() {
             >
               <source src="/video/chameleon-coding.mp4" type="video/mp4" />
             </video>
+
+            {nervous ? (
+              <>
+                <div
+                  className="animate-speech-pop pointer-events-none absolute left-1/2 top-3 z-10 -translate-x-1/2"
+                  aria-hidden="true"
+                >
+                  <div className="relative whitespace-nowrap rounded-xl border border-orange-300/40 bg-[#1a1208]/95 px-3 py-1.5 font-[family-name:var(--font-jetbrains)] text-xs font-semibold tracking-wide text-orange-200 shadow-lg">
+                    {HERO.chameleon.dontDistract}
+                    <span className="absolute -bottom-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-b border-r border-orange-300/40 bg-[#1a1208]/95" />
+                  </div>
+                </div>
+
+                <ChameleonPaw className="animate-paw-wave-left pointer-events-none absolute bottom-6 left-4 z-10 origin-bottom-right" />
+                <ChameleonPaw className="animate-paw-wave-right pointer-events-none absolute bottom-6 right-4 z-10 origin-bottom-left scale-x-[-1]" />
+              </>
+            ) : null}
           </div>
         </div>
       </div>

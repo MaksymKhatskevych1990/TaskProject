@@ -160,3 +160,47 @@ body {
 .animate-nervous-glow {
   animation: nervous-glow 0.35s ease-in-out infinite;
 }
+
+@keyframes paw-wave-left {
+  0%,
+  100% {
+    transform: rotate(18deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-28deg) translateY(-6px);
+  }
+}
+
+@keyframes paw-wave-right {
+  0%,
+  100% {
+    transform: rotate(-18deg) translateY(0);
+  }
+  50% {
+    transform: rotate(28deg) translateY(-6px);
+  }
+}
+
+.animate-paw-wave-left {
+  animation: paw-wave-left 0.28s ease-in-out infinite;
+}
+
+.animate-paw-wave-right {
+  animation: paw-wave-right 0.28s ease-in-out infinite;
+  animation-delay: 0.08s;
+}
+
+@keyframes speech-pop {
+  0% {
+    opacity: 0;
+    transform: translateY(6px) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-speech-pop {
+  animation: speech-pop 0.2s ease-out forwards;
+}
