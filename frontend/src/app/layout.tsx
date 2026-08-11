@@ -1,27 +1,10 @@
 import type { Metadata } from "next";
-import { DM_Sans, Exo_2, JetBrains_Mono } from "next/font/google";
+import { dmSans, exo2, jetbrains } from "@/app/fonts";
+import { SITE } from "@/lib/site-data";
 import "./globals.css";
 
-const exo2 = Exo_2({
-  variable: "--font-exo2",
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "600", "700", "800"],
-});
-
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const jetbrains = JetBrains_Mono({
-  variable: "--font-jetbrains",
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500"],
-});
-
 export const metadata: Metadata = {
-  title: "Devcraft — IT-студія | Сайти, магазини, Telegram-боти",
+  title: `${SITE.brand} — IT-студія | Сайти, магазини, Telegram-боти`,
   description:
     "Запустимо ваш бізнес онлайн за 14 днів. Сайти, інтернет-магазини, Telegram-боти та автоматизація під ключ.",
 };

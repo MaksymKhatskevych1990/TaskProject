@@ -1,5 +1,7 @@
 export const SITE = {
-  brand: "Devcraft",
+  brand: "Chameleon Digital Studio",
+  brandShort: "Chameleon",
+  domain: "chameleon.digital",
   telegramUrl: "https://t.me/devcraft_studio",
   telegramUsername: "devcraft_studio",
   currency: "₴",

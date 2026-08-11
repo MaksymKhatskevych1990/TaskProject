@@ -9,7 +9,7 @@ export type ContactPayload = {
 
 export function buildTelegramContactUrl(payload: ContactPayload): string {
   const lines = [
-    "Нова заявка з сайту Devcraft",
+    `Нова заявка з сайту ${SITE.brand}`,
     "",
     `Ім'я: ${payload.name}`,
     `Контакт: ${payload.phone}`,

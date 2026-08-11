@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import { CodeTypingBackground } from "@/components/sections/CodeTypingBackground";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
-import { HERO } from "@/lib/site-data";
+import { HERO, SITE } from "@/lib/site-data";
 
 function BrowserMockup() {
   return (
@@ -15,7 +16,7 @@ function BrowserMockup() {
             <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
             <span className="h-2.5 w-2.5 rounded-full bg-green-400/80" />
             <span className="ml-2 font-[family-name:var(--font-jetbrains)] text-[10px] text-muted">
-              devcraft.studio
+              {SITE.domain}
             </span>
           </div>
           <div className="space-y-3 p-4">
@@ -30,23 +31,8 @@ function BrowserMockup() {
           </div>
         </div>
 
-        <div className="absolute -right-4 top-8 w-44 rounded-xl border border-cyan/30 bg-[#0d1224] p-3 shadow-lg shadow-cyan/20">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-cyan/20 text-xs">
-              🤖
-            </span>
-            <span className="font-[family-name:var(--font-jetbrains)] text-[10px] text-cyan">
-              {HERO.mockup.botLabel}
-            </span>
-          </div>
-          <div className="space-y-1.5">
-            <div className="rounded-lg rounded-bl-none bg-cyan/10 px-2 py-1 text-[10px]">
-              {HERO.mockup.botGreeting}
-            </div>
-            <div className="ml-auto w-fit rounded-lg rounded-br-none bg-violet/20 px-2 py-1 text-[10px]">
-              {HERO.mockup.userMessage}
-            </div>
-          </div>
+        <div className="absolute -right-4 top-8 rounded-2xl border border-cyan/30 bg-[#0d1224] px-4 py-4 shadow-lg shadow-cyan/20">
+          <BrandLogo emblemSize="lg" />
         </div>
       </div>
     </RevealOnScroll>

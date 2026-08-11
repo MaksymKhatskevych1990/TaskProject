@@ -7,9 +7,10 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 ARG API_URL=http://127.0.0.1:8000
 ENV API_URL=${API_URL}
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS=--max-old-space-size=4096
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 FROM node:20-alpine AS runner

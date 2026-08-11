@@ -12,7 +12,7 @@ import { cn } from "@/lib/utils";
 const TYPING_INTERVAL_MS = 300;
 const LOOP_PAUSE_MS = 2000;
 
-const JS_CODE = `// Devcraft launch pipeline
+const JS_CODE = `// Chameleon launch pipeline
 const project = {
   name: "client-site",
   deadline: 14,
@@ -25,7 +25,7 @@ async function deploy() {
   return "Live!";
 }`;
 
-const PYTHON_CODE = `# Devcraft automation
+const PYTHON_CODE = `# Chameleon automation
 def create_bot(token: str):
     bot = TelegramBot(token)
     bot.add_handler("/start", greet)

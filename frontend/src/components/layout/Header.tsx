@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import { HEADER, HERO, NAV_LINKS, SITE } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
@@ -20,16 +21,13 @@ export function Header() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-[#070b18]/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5" onClick={closeMenu}>
-          <span
-            aria-hidden="true"
-            className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-cyan to-violet text-lg"
-          >
-            ⚡
-          </span>
-          <span className="font-[family-name:var(--font-exo2)] text-lg font-bold tracking-tight">
-            {SITE.brand}
-          </span>
+        <Link
+          href="/"
+          className="flex shrink-0 items-center"
+          onClick={closeMenu}
+          aria-label={`${SITE.brand} — на головну`}
+        >
+          <BrandLogo emblemVariant="header" />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex" aria-label={HEADER.navigation}>

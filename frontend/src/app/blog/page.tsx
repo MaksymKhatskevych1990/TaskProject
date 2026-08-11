@@ -4,14 +4,14 @@ import { Header } from "@/components/layout/Header";
 import { BlogCard } from "@/components/blog/BlogCard";
 import { FloatingTelegramButton } from "@/components/sections/FloatingTelegramButton";
 import { getBlogPosts } from "@/lib/blog-api";
-import { BLOG_PAGE } from "@/lib/site-data";
+import { BLOG_PAGE, SITE } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Блог — Devcraft",
+  title: `Блог — ${SITE.brand}`,
   description:
-    "Поради з дизайну, розробки сайтів та SEO від команди Devcraft. Корисні матеріали для бізнесу.",
+    `Поради з дизайну, розробки сайтів та SEO від команди ${SITE.brandShort}. Корисні матеріали для бізнесу.`,
 };
 
 export default async function BlogPage() {
