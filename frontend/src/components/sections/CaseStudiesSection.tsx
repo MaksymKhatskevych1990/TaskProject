@@ -1,10 +1,11 @@
 import { CASES, SECTIONS } from "@/lib/site-data";
+import { cn } from "@/lib/utils";
 
 export function CaseStudiesSection() {
   return (
     <section id="cases" className="relative py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 text-center">
+        <div className="mb-12 section-intro">
           <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
             {SECTIONS.cases.eyebrow}
           </p>
@@ -13,11 +14,14 @@ export function CaseStudiesSection() {
           </h2>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-3 md:items-stretch">
-          {CASES.map((item) => (
+        <div className="grid gap-5 md:grid-cols-3 md:items-stretch">
+          {CASES.map((item, index) => (
             <article
               key={item.title}
-              className="flex h-full min-h-[22rem] flex-col rounded-2xl border border-white/5 bg-card p-6"
+              className={cn(
+                "flex h-full min-h-[22rem] flex-col border border-white/5 bg-card p-6",
+                index % 2 === 0 ? "surface-card" : "surface-card-alt",
+              )}
             >
               <span aria-hidden="true" className="block h-8 shrink-0 text-3xl leading-none">
                 {item.emoji}

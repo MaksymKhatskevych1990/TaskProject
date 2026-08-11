@@ -15,24 +15,25 @@ export function ServicesSection() {
   return (
     <section id="services" className="relative py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 text-center">
+        <div className="mb-12 section-intro">
           <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
             {SECTIONS.services.eyebrow}
           </p>
           <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
             {SECTIONS.services.title}
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
             {SECTIONS.services.subtitle}
           </p>
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          {featuredServices.map((service) => (
+        <div className="grid gap-5 lg:grid-cols-3">
+          {featuredServices.map((service, index) => (
             <article
               key={service.title}
               className={cn(
-                "group flex flex-col rounded-2xl border border-white/5 bg-card p-6 transition-all duration-300 hover:shadow-lg",
+                "group flex flex-col border border-white/5 bg-card p-6 transition-all duration-300 hover:shadow-lg",
+                index % 2 === 0 ? "surface-card" : "surface-card-alt",
                 glowClasses[service.glow as keyof typeof glowClasses],
               )}
             >
@@ -64,15 +65,16 @@ export function ServicesSection() {
 
         {additionalServices.length > 0 && (
           <div className="mt-14">
-            <p className="mb-6 text-center font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-muted">
+            <p className="mb-6 font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-muted">
               {SECTIONS.services.also}
             </p>
-            <div className="mx-auto grid max-w-3xl gap-6 sm:grid-cols-2">
-              {additionalServices.map((service) => (
+            <div className="grid max-w-3xl gap-5 sm:grid-cols-2">
+              {additionalServices.map((service, index) => (
                 <article
                   key={service.title}
                   className={cn(
-                    "group rounded-2xl border border-white/5 bg-card p-6 transition-all duration-300 hover:shadow-lg",
+                    "group border border-white/5 bg-card p-6 transition-all duration-300 hover:shadow-lg",
+                    index === 0 ? "surface-card-alt" : "surface-card",
                     glowClasses[service.glow as keyof typeof glowClasses],
                   )}
                 >

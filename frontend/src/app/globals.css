@@ -204,3 +204,131 @@ body {
 .animate-speech-pop {
   animation: speech-pop 0.2s ease-out forwards;
 }
+
+@layer components {
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem 0.5rem 0 0.5rem;
+    background: linear-gradient(to right, var(--cyan), var(--violet));
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #070b18;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .btn-primary:hover {
+    opacity: 0.92;
+    transform: translateY(-1px);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.6;
+    transform: none;
+  }
+
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem 0 0.5rem 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.625rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition:
+      border-color 0.2s ease,
+      background 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .btn-secondary:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.05);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem 0.5rem 0 0.5rem;
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--cyan);
+    transition: background 0.2s ease;
+  }
+
+  .btn-ghost:hover {
+    background: rgba(0, 212, 255, 0.1);
+  }
+
+  .section-intro {
+    position: relative;
+    max-width: 42rem;
+    padding-left: 1.25rem;
+    text-align: left;
+  }
+
+  .section-intro::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.125rem;
+    bottom: 0.125rem;
+    width: 2px;
+    background: var(--gradient);
+    border-radius: 1px;
+  }
+
+  .surface-card {
+    border-radius: 1rem 1rem 0 1rem;
+  }
+
+  .surface-card-alt {
+    border-radius: 1rem 0 1rem 1rem;
+  }
+
+  .badge-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    border-left: 2px solid var(--cyan);
+    background: rgba(0, 212, 255, 0.05);
+    padding: 0.375rem 0.875rem 0.375rem 0.75rem;
+    font-family: var(--font-jetbrains), monospace;
+    font-size: 0.75rem;
+    color: var(--cyan);
+    letter-spacing: 0.04em;
+  }
+
+  .nav-link {
+    position: relative;
+    font-size: 0.875rem;
+    color: var(--muted);
+    transition: color 0.2s ease;
+  }
+
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -0.25rem;
+    width: 0;
+    height: 1px;
+    background: var(--cyan);
+    transition: width 0.25s ease;
+  }
+
+  .nav-link:hover {
+    color: var(--foreground);
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+}

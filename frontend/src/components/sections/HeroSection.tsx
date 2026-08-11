@@ -68,7 +68,7 @@ function HeroVideo() {
         >
           <div
             className={cn(
-              "relative overflow-hidden rounded-2xl border bg-[#0d1224] shadow-2xl transition-colors duration-200",
+              "relative overflow-hidden rounded-2xl rounded-tr-none border bg-[#0d1224] shadow-2xl transition-colors duration-200",
               nervous
                 ? "animate-nervous-shake animate-nervous-glow border-orange-400/50"
                 : "border-white/10 shadow-cyan/10 ring-1 ring-cyan/10",
@@ -126,41 +126,35 @@ export function HeroSection() {
       <div className="glow-orb -left-32 top-20 h-96 w-96 bg-cyan/20" />
       <div className="glow-orb -right-32 bottom-0 h-80 w-80 bg-violet/20" />
 
-      <div className="relative z-10 mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
+      <div className="relative z-10 mx-auto grid max-w-6xl items-end gap-10 px-4 sm:px-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
         <div
-          className={`space-y-6 transition-all duration-700 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
+          className={`space-y-7 transition-all duration-700 lg:pb-6 ${visible ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"}`}
         >
-          <div className="inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/5 px-4 py-1.5">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-cyan" />
-            <span className="font-[family-name:var(--font-jetbrains)] text-xs text-cyan">
-              {HERO.badge}
-            </span>
+          <div className="badge-tag">
+            <span className="h-1.5 w-1.5 shrink-0 bg-cyan" aria-hidden="true" />
+            {HERO.badge}
           </div>
 
-          <h1 className="font-[family-name:var(--font-exo2)] text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
+          <h1 className="font-[family-name:var(--font-exo2)] text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.35rem]">
             {HERO.title}{" "}
             <span className="gradient-text">{HERO.titleAccent}</span>
           </h1>
 
-          <p className="max-w-xl text-lg text-muted">{HERO.subtitle}</p>
+          <p className="max-w-lg text-lg leading-relaxed text-muted">{HERO.subtitle}</p>
 
-          <div className="flex flex-wrap gap-4">
-            <a
-              href="#contact"
-              className="rounded-full bg-gradient-to-r from-cyan to-violet px-6 py-3 text-sm font-semibold text-[#070b18] transition-opacity hover:opacity-90"
-            >
+          <div className="flex flex-col gap-3 pt-1 sm:flex-row sm:items-center sm:gap-4">
+            <a href="#contact" className="btn-primary px-7 py-3.5">
               {HERO.primaryCta}
             </a>
-            <a
-              href="#portfolio"
-              className="rounded-full border border-white/10 px-6 py-3 text-sm font-medium transition-colors hover:border-white/20 hover:bg-white/5"
-            >
+            <a href="#portfolio" className="btn-secondary px-7 py-3.5">
               {HERO.secondaryCta}
             </a>
           </div>
         </div>
 
-        <HeroVideo />
+        <div className="lg:-mr-4 lg:translate-y-2">
+          <HeroVideo />
+        </div>
       </div>
     </section>
   );

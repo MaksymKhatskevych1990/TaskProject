@@ -30,7 +30,7 @@ export function BrandLogo({
     <span className={cn("flex items-center gap-3", className)}>
       <span
         className={cn(
-          "relative shrink-0 overflow-hidden rounded-xl border border-cyan/25 bg-[#0a1020] shadow-lg shadow-cyan/15 ring-1 ring-white/10",
+          "relative shrink-0 overflow-hidden rounded-lg rounded-tr-none border border-cyan/25 bg-[#0a1020] shadow-lg shadow-cyan/15 ring-1 ring-white/10",
           emblemSizes[emblemSize],
         )}
         aria-hidden="true"

@@ -10,7 +10,7 @@ export function FAQSection() {
   return (
     <section id="faq" className="relative py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="mb-12 text-center">
+        <div className="mb-12 section-intro">
           <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
             {SECTIONS.faq.eyebrow}
           </p>
@@ -19,14 +19,17 @@ export function FAQSection() {
           </h2>
         </div>
 
-        <div className="space-y-3">
+        <div className="space-y-2">
           {FAQ_ITEMS.map((item, index) => {
             const isOpen = openIndex === index;
 
             return (
               <div
                 key={item.question}
-                className="overflow-hidden rounded-2xl border border-white/5 bg-card"
+                className={cn(
+                  "overflow-hidden border border-white/5 bg-card",
+                  index % 2 === 0 ? "surface-card" : "surface-card-alt",
+                )}
               >
                 <button
                   type="button"

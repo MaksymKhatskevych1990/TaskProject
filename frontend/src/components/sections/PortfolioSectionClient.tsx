@@ -134,7 +134,7 @@ function PortfolioCaseModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-full border border-white/10 px-3 py-1.5 text-sm text-muted transition-colors hover:border-white/20 hover:text-foreground"
+            className="rounded-lg rounded-tr-none border border-white/10 px-3 py-1.5 text-sm text-muted transition-colors hover:border-white/20 hover:text-foreground"
             aria-label="Закрити"
           >
             ✕
@@ -223,7 +223,7 @@ function PortfolioCaseModal({
                 href={project.clientUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex flex-1 items-center justify-center rounded-full border border-white/10 px-5 py-2.5 text-sm font-medium transition-colors hover:border-cyan/40 hover:text-cyan"
+                className="btn-secondary inline-flex flex-1 px-5 py-2.5"
               >
                 Відкрити сайт
               </a>
@@ -231,7 +231,7 @@ function PortfolioCaseModal({
             <Link
               href="/#contact"
               onClick={onClose}
-              className="inline-flex flex-1 items-center justify-center rounded-full bg-gradient-to-r from-cyan to-violet px-5 py-2.5 text-sm font-semibold text-[#070b18] transition-opacity hover:opacity-90"
+              className="btn-primary inline-flex flex-1 px-5 py-2.5"
             >
               {SECTIONS.portfolio.viewAll}
           </Link>
@@ -268,26 +268,27 @@ export function PortfolioSectionClient({
     <>
       <section id="portfolio" className="relative py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mb-12 text-center">
+          <div className="mb-12 section-intro">
             <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
               {SECTIONS.portfolio.eyebrow}
             </p>
             <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
               {SECTIONS.portfolio.title}
             </h2>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
               {SECTIONS.portfolio.subtitle}
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {projects.map((project, index) => (
               <button
                 key={project.slug}
                 type="button"
                 onClick={() => openProject(project.slug)}
                 className={cn(
-                  "group flex cursor-pointer flex-col rounded-2xl border border-white/5 bg-card p-5 text-left transition-all duration-300 hover:shadow-lg",
+                  "group flex cursor-pointer flex-col border border-white/5 bg-card p-5 text-left transition-all duration-300 hover:shadow-lg",
+                  index % 2 === 0 ? "surface-card" : "surface-card-alt",
                   accentClasses[project.accent],
                 )}
               >
@@ -332,10 +333,10 @@ export function PortfolioSectionClient({
             ))}
           </div>
 
-          <div className="mt-12 text-center">
+          <div className="mt-12">
             <Link
               href="/#contact"
-              className="inline-flex rounded-full bg-gradient-to-r from-cyan to-violet px-6 py-3 text-sm font-semibold text-[#070b18] transition-opacity hover:opacity-90"
+              className="btn-primary px-6 py-3"
             >
               {SECTIONS.portfolio.viewAll}
             </Link>

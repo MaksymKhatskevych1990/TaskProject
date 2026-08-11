@@ -1,10 +1,11 @@
 import { GUARANTEES, SECTIONS } from "@/lib/site-data";
+import { cn } from "@/lib/utils";
 
 export function GuaranteesSection() {
   return (
     <section className="relative py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 text-center">
+        <div className="mb-12 section-intro">
           <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
             {SECTIONS.guarantees.eyebrow}
           </p>
@@ -13,11 +14,14 @@ export function GuaranteesSection() {
           </h2>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {GUARANTEES.map((item) => (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {GUARANTEES.map((item, index) => (
             <article
               key={item.title}
-              className="rounded-2xl border border-white/5 bg-card p-6 text-center"
+              className={cn(
+                "border border-white/5 bg-card p-6 text-left",
+                index % 2 === 0 ? "surface-card" : "surface-card-alt",
+              )}
             >
               <span aria-hidden="true" className="text-3xl">
                 {item.icon}

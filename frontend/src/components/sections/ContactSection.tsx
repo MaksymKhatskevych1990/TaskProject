@@ -53,15 +53,15 @@ export function ContactSection() {
       <div className="glow-orb left-1/2 top-0 h-64 w-64 -translate-x-1/2 bg-violet/20" />
 
       <div className="relative mx-auto max-w-xl px-4 sm:px-6">
-        <div className="mb-8 text-center">
+        <div className="mb-10 section-intro">
           <h2 className="font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
             {CONTACT.title}
           </h2>
-          <p className="mt-3 text-sm text-muted">{CONTACT.subtitle}</p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">{CONTACT.subtitle}</p>
         </div>
 
         {submitted ? (
-          <div className="rounded-2xl border border-cyan/30 bg-cyan/5 p-8 text-center">
+          <div className="surface-card border border-cyan/30 bg-cyan/5 p-8 text-left">
             <span className="text-4xl">✓</span>
             <h3 className="mt-4 font-[family-name:var(--font-exo2)] text-xl font-semibold">
               {CONTACT.successTitle}
@@ -71,7 +71,7 @@ export function ContactSection() {
               href={SITE.telegramUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex rounded-full border border-cyan/30 px-5 py-2 text-sm font-medium text-cyan transition-colors hover:bg-cyan/10"
+              className="btn-ghost mt-6"
             >
               {SITE.brand} Telegram
             </a>
@@ -80,7 +80,7 @@ export function ContactSection() {
           <form
             onSubmit={handleSubmit}
             data-snap-ignore
-            className="space-y-4 rounded-2xl border border-white/5 bg-card p-6"
+            className="surface-card-alt space-y-4 border border-white/5 bg-card p-6"
           >
             {plan && (
               <div className="rounded-xl border border-cyan/20 bg-cyan/5 px-4 py-3 text-sm">
@@ -98,7 +98,7 @@ export function ContactSection() {
                 name="name"
                 required
                 autoComplete="name"
-                className="w-full rounded-xl border border-white/10 bg-[#070b18] px-4 py-3 text-sm outline-none transition-colors focus:border-cyan/50"
+                className="w-full rounded-lg rounded-tr-none border border-white/10 bg-[#070b18] px-4 py-3 text-sm outline-none transition-colors focus:border-cyan/50"
                 placeholder={CONTACT.fields.name.placeholder}
               />
             </div>
@@ -112,7 +112,7 @@ export function ContactSection() {
                 name="phone"
                 required
                 autoComplete="tel"
-                className="w-full rounded-xl border border-white/10 bg-[#070b18] px-4 py-3 text-sm outline-none transition-colors focus:border-cyan/50"
+                className="w-full rounded-lg rounded-tr-none border border-white/10 bg-[#070b18] px-4 py-3 text-sm outline-none transition-colors focus:border-cyan/50"
                 placeholder={CONTACT.fields.phone.placeholder}
               />
             </div>
@@ -126,7 +126,7 @@ export function ContactSection() {
                 name="project"
                 required
                 rows={4}
-                className="w-full resize-none rounded-xl border border-white/10 bg-[#070b18] px-4 py-3 text-sm outline-none transition-colors focus:border-cyan/50"
+                className="w-full resize-none rounded-lg rounded-tr-none border border-white/10 bg-[#070b18] px-4 py-3 text-sm outline-none transition-colors focus:border-cyan/50"
                 placeholder={CONTACT.fields.project.placeholder}
               />
             </div>
@@ -140,7 +140,7 @@ export function ContactSection() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-full bg-gradient-to-r from-cyan to-violet py-3 text-sm font-semibold text-[#070b18] transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="btn-primary w-full py-3 disabled:opacity-60"
             >
               {loading ? CONTACT.submitting : CONTACT.submit}
             </button>

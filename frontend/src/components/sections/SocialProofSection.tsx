@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { STATS, TESTIMONIALS } from "@/lib/site-data";
+import { cn } from "@/lib/utils";
 
 function AnimatedCounter({
   value,
@@ -61,24 +62,29 @@ export function SocialProofSection() {
     <section className="relative py-20">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <RevealOnScroll>
-          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
+          <div className="flex flex-wrap divide-x divide-white/10 border-y border-white/10">
             {STATS.map((stat) => (
-              <div key={stat.label} className="text-center">
+              <div key={stat.label} className="min-w-[50%] flex-1 px-4 py-8 text-left sm:min-w-0 sm:px-6">
                 <AnimatedCounter
                   value={stat.value}
                   suffix={stat.suffix}
                   decimals={"decimals" in stat ? stat.decimals : 0}
                 />
-                <p className="mt-2 text-sm text-muted">{stat.label}</p>
+                <p className="mt-2 max-w-[10rem] text-sm text-muted">{stat.label}</p>
               </div>
             ))}
           </div>
         </RevealOnScroll>
 
-        <div className="mt-16 grid gap-6 md:grid-cols-3">
+        <div className="mt-16 grid gap-5 md:grid-cols-3">
           {TESTIMONIALS.map((item, index) => (
             <RevealOnScroll key={item.name} delayMs={index * 100}>
-              <article className="h-full rounded-2xl border border-white/5 bg-card p-6 transition-colors hover:border-white/10">
+              <article
+                className={cn(
+                  "h-full border border-white/5 bg-card p-6 transition-colors hover:border-white/10",
+                  index % 2 === 0 ? "surface-card" : "surface-card-alt",
+                )}
+              >
               <div className="mb-3 text-amber-400">
                 {"★".repeat(item.rating)}
               </div>
