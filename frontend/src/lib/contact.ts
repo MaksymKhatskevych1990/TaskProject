@@ -23,13 +23,15 @@ export function buildTelegramContactUrl(payload: ContactPayload): string {
 }
 
 export async function submitContact(payload: ContactPayload): Promise<void> {
-  const response = await fetch("/api/contact", {
+  const response = await fetch("/api/v1/website/contact/", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
+  const data = (await response.json()) as { success?: boolean };
+
+  if (!response.ok || !data.success) {
     throw new Error("Contact submission failed");
   }
 }

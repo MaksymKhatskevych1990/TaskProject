@@ -5,7 +5,7 @@ from datetime import datetime, timezone as dt_timezone
 from django.urls import reverse
 from rest_framework import status
 
-from apps.website.models import BlogCategory, BlogPost
+from apps.website.models import BlogCategory, BlogPost, ContactLead
 from tests.base import BaseAPITestCase
 
 
@@ -27,6 +27,23 @@ class WebsiteContactAPITests(BaseAPITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data["success"])
+        self.assertEqual(ContactLead.objects.count(), 1)
+
+    def test_contact_lead_alias_route_persists_record(self) -> None:
+        """The /api/contact/ alias used by the landing page stores leads."""
+        response = self.client.post(
+            reverse("api:contact"),
+            {
+                "name": "Іван К.",
+                "phone": "+380501112233",
+                "project": "Потрібен корпоративний сайт",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(response.data["success"])
+        self.assertEqual(ContactLead.objects.count(), 1)
 
     def test_contact_lead_rejects_missing_fields(self) -> None:
         """Required fields must be present."""

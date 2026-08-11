@@ -1,38 +1,78 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { BrandLogo } from "@/components/layout/BrandLogo";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CodeTypingBackground } from "@/components/sections/CodeTypingBackground";
 import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
-import { HERO, SITE } from "@/lib/site-data";
+import { HERO } from "@/lib/site-data";
+import { cn } from "@/lib/utils";
 
-function BrowserMockup() {
+const NORMAL_PLAYBACK_RATE = 1;
+const NERVOUS_PLAYBACK_RATE = 1.85;
+
+function HeroVideo() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [nervous, setNervous] = useState(false);
+
+  const setPlaybackRate = useCallback((rate: number) => {
+    const video = videoRef.current;
+    if (video) {
+      video.playbackRate = rate;
+    }
+  }, []);
+
+  const handlePointerEnter = useCallback(() => {
+    setNervous(true);
+    setPlaybackRate(NERVOUS_PLAYBACK_RATE);
+  }, [setPlaybackRate]);
+
+  const handlePointerLeave = useCallback(() => {
+    setNervous(false);
+    setPlaybackRate(NORMAL_PLAYBACK_RATE);
+  }, [setPlaybackRate]);
+
+  useEffect(() => {
+    return () => setPlaybackRate(NORMAL_PLAYBACK_RATE);
+  }, [setPlaybackRate]);
+
   return (
     <RevealOnScroll delayMs={200}>
       <div className="animate-float relative mx-auto w-full max-w-md">
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1224] shadow-2xl shadow-cyan/10">
-          <div className="flex items-center gap-1.5 border-b border-white/5 px-4 py-3">
-            <span className="h-2.5 w-2.5 rounded-full bg-red-400/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-yellow-400/80" />
-            <span className="h-2.5 w-2.5 rounded-full bg-green-400/80" />
-            <span className="ml-2 font-[family-name:var(--font-jetbrains)] text-[10px] text-muted">
-              {SITE.domain}
-            </span>
+        <div
+          className="cursor-pointer select-none"
+          onMouseEnter={handlePointerEnter}
+          onMouseLeave={handlePointerLeave}
+          onFocus={handlePointerEnter}
+          onBlur={handlePointerLeave}
+          onTouchStart={handlePointerEnter}
+          onTouchEnd={handlePointerLeave}
+          onTouchCancel={handlePointerLeave}
+          tabIndex={0}
+          role="img"
+          aria-label="Chameleon Digital Studio — наведи курсор, щоб хameleon хвилювався"
+        >
+          <div
+            className={cn(
+              "overflow-hidden rounded-2xl border bg-[#0d1224] shadow-2xl transition-colors duration-200",
+              nervous
+                ? "animate-nervous-shake animate-nervous-glow border-orange-400/50"
+                : "border-white/10 shadow-cyan/10 ring-1 ring-cyan/10",
+            )}
+          >
+            <video
+              ref={videoRef}
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+              className={cn(
+                "aspect-[4/5] w-full object-cover transition-[filter] duration-200",
+                nervous && "saturate-125 contrast-110",
+              )}
+            >
+              <source src="/video/chameleon-coding.mp4" type="video/mp4" />
+            </video>
           </div>
-          <div className="space-y-3 p-4">
-            <div className="h-3 w-3/4 rounded bg-gradient-to-r from-cyan/40 to-violet/40" />
-            <div className="h-2 w-full rounded bg-white/5" />
-            <div className="h-2 w-5/6 rounded bg-white/5" />
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-16 rounded-lg bg-white/5" />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="absolute -right-4 top-8 rounded-2xl border border-cyan/30 bg-[#0d1224] px-4 py-4 shadow-lg shadow-cyan/20">
-          <BrandLogo emblemSize="lg" />
         </div>
       </div>
     </RevealOnScroll>
@@ -87,7 +127,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        <BrowserMockup />
+        <HeroVideo />
       </div>
     </section>
   );
