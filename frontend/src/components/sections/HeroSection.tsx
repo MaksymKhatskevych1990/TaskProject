@@ -5,73 +5,92 @@ import { formatPrice, HERO, HERO_BRIEF } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
 const TYPING_LOOP_START = 7;
-const TYPING_LOOP_END = 9.95;
+const TYPING_LOOP_END = 9.85;
 const HEAD_TURN_START = 1.75;
 const HEAD_TURN_END = 4;
 
-function HeroVideo() {
+function seekAndPlay(video: HTMLVideoElement, time: number) {
+  const play = () => {
+    void video.play();
+  };
+
+  if (Math.abs(video.currentTime - time) < 0.04) {
+    play();
+    return;
+  }
+
+  const onSeeked = () => {
+    video.removeEventListener("seeked", onSeeked);
+    play();
+  };
+
+  video.addEventListener("seeked", onSeeked);
+  video.currentTime = time;
+}
+
+function HeroVideo({ className }: { className?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hoveredRef = useRef(false);
+  const lookingRef = useRef(false);
 
   const startTypingLoop = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
-    video.currentTime = TYPING_LOOP_START;
-    void video.play();
+    lookingRef.current = false;
+    seekAndPlay(video, TYPING_LOOP_START);
   }, []);
 
-  const handleTimeUpdate = useCallback(() => {
+  const lookAtCursor = useCallback(() => {
     const video = videoRef.current;
-    if (!video) return;
-
-    if (hoveredRef.current) {
-      if (video.currentTime >= HEAD_TURN_END) {
-        video.pause();
-        video.currentTime = HEAD_TURN_END;
-      }
-      return;
-    }
-
-    if (video.currentTime >= TYPING_LOOP_END || video.currentTime < TYPING_LOOP_START) {
-      video.currentTime = TYPING_LOOP_START;
-    }
+    if (!video || lookingRef.current) return;
+    lookingRef.current = true;
+    seekAndPlay(video, HEAD_TURN_START);
   }, []);
-
-  const handlePointerEnter = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    hoveredRef.current = true;
-    video.currentTime = HEAD_TURN_START;
-    void video.play();
-  }, []);
-
-  const handlePointerLeave = useCallback(() => {
-    hoveredRef.current = false;
-    startTypingLoop();
-  }, [startTypingLoop]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
+    let frame = 0;
+
+    const tick = () => {
+      if (lookingRef.current) {
+        if (video.currentTime >= HEAD_TURN_END && video.currentTime < TYPING_LOOP_START) {
+          video.pause();
+          if (Math.abs(video.currentTime - HEAD_TURN_END) > 0.03) {
+            video.currentTime = HEAD_TURN_END;
+          }
+        }
+      } else if (
+        video.ended ||
+        video.currentTime >= TYPING_LOOP_END ||
+        video.currentTime < TYPING_LOOP_START - 0.05
+      ) {
+        video.currentTime = TYPING_LOOP_START;
+        void video.play();
+      }
+
+      frame = requestAnimationFrame(tick);
+    };
+
     const onLoaded = () => startTypingLoop();
     video.addEventListener("loadedmetadata", onLoaded);
+    video.addEventListener("ended", startTypingLoop);
     if (video.readyState >= 1) startTypingLoop();
+    frame = requestAnimationFrame(tick);
 
-    return () => video.removeEventListener("loadedmetadata", onLoaded);
+    return () => {
+      cancelAnimationFrame(frame);
+      video.removeEventListener("loadedmetadata", onLoaded);
+      video.removeEventListener("ended", startTypingLoop);
+    };
   }, [startTypingLoop]);
 
   return (
     <div
-      className="cursor-pointer select-none"
-      onMouseEnter={handlePointerEnter}
-      onMouseLeave={handlePointerLeave}
-      onFocus={handlePointerEnter}
-      onBlur={handlePointerLeave}
-      onTouchStart={handlePointerEnter}
-      onTouchEnd={handlePointerLeave}
-      onTouchCancel={handlePointerLeave}
-      tabIndex={0}
+      className={cn("h-full w-full cursor-pointer select-none", className)}
+      onPointerEnter={lookAtCursor}
+      onPointerLeave={startTypingLoop}
+      onPointerDown={lookAtCursor}
       role="img"
       aria-label={HERO.chameleon.ariaLabel}
     >
@@ -79,8 +98,8 @@ function HeroVideo() {
         ref={videoRef}
         muted
         playsInline
+        autoPlay
         preload="auto"
-        onTimeUpdate={handleTimeUpdate}
         className="h-full w-full object-cover object-top"
       >
         <source src="/video/first.mp4" type="video/mp4" />
@@ -95,18 +114,15 @@ export function HeroSection() {
 
   return (
     <section className="relative min-h-[100svh] overflow-hidden">
-      <div
-        className="pointer-events-none absolute inset-y-0 right-0 hidden w-[min(52vw,640px)] lg:block"
-        aria-hidden="true"
-      >
-        <div className="pointer-events-auto absolute inset-0 [mask-image:linear-gradient(to_right,transparent_0%,black_28%)]">
+      <div className="absolute inset-y-0 right-0 z-[1] hidden w-[min(52vw,640px)] lg:block">
+        <div className="h-full w-full [mask-image:linear-gradient(to_right,transparent_0%,black_28%)]">
           <HeroVideo />
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[90rem] flex-col justify-between px-5 pb-8 pt-28 sm:px-8 sm:pb-10 lg:px-12 lg:pb-12">
+      <div className="relative z-10 mx-auto flex min-h-[100svh] max-w-[90rem] flex-col justify-between px-5 pb-8 pt-28 sm:px-8 sm:pb-10 lg:pointer-events-none lg:px-12 lg:pb-12">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-end lg:gap-8">
-          <div className="hologram-panel max-w-3xl">
+          <div className="hologram-panel max-w-3xl lg:pointer-events-auto">
             <div
               className="hologram-reveal flex flex-wrap items-baseline gap-x-4 gap-y-1"
               style={{ animationDelay: "0ms" }}
@@ -140,7 +156,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        <div className="mt-10 max-w-3xl lg:mt-0">
+        <div className="mt-10 max-w-3xl lg:pointer-events-auto lg:mt-0">
           <div
             className="hologram-reveal border-t border-[var(--card-border)]"
             style={{ animationDelay: "720ms" }}
@@ -210,7 +226,7 @@ export function HeroSection() {
           </div>
         </div>
 
-        <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-2 border-t border-[var(--card-border)] pt-5 text-xs text-muted">
+        <ul className="mt-10 flex flex-wrap gap-x-8 gap-y-2 border-t border-[var(--card-border)] pt-5 text-xs text-muted lg:pointer-events-auto">
           {HERO.conditions.map((item) => (
             <li key={item} className="flex items-center gap-2">
               <span className="h-1 w-1 rounded-full bg-accent" />
