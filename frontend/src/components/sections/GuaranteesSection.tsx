@@ -1,39 +1,35 @@
 import { GUARANTEES, SECTIONS } from "@/lib/site-data";
-import { cn } from "@/lib/utils";
 
 export function GuaranteesSection() {
   return (
-    <section className="relative py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 section-intro">
-          <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-            {SECTIONS.guarantees.eyebrow}
-          </p>
-          <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
-            {SECTIONS.guarantees.title}
-          </h2>
-        </div>
+    <section id="guarantees" className="bg-[var(--card)] py-24 sm:py-32">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
+        <div className="grid gap-12 lg:grid-cols-2 lg:gap-20">
+          <div>
+            <p className="section-number mb-4">06</p>
+            <h2 className="editorial-heading text-3xl sm:text-4xl">
+              {SECTIONS.guarantees.title}
+            </h2>
+          </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {GUARANTEES.map((item, index) => (
-            <article
-              key={item.title}
-              className={cn(
-                "border border-white/5 bg-card p-6 text-left",
-                index % 2 === 0 ? "surface-card" : "surface-card-alt",
-              )}
-            >
-              <span aria-hidden="true" className="text-3xl">
-                {item.icon}
-              </span>
-              <h3 className="mt-4 font-[family-name:var(--font-exo2)] text-base font-semibold">
-                {item.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
-                {item.description}
-              </p>
-            </article>
-          ))}
+          <div className="space-y-8">
+            {GUARANTEES.map((item, index) => (
+              <div
+                key={item.title}
+                className="grid grid-cols-[2rem_1fr] gap-4 border-t border-[var(--card-border)] pt-8 first:border-t-0 first:pt-0"
+              >
+                <span className="font-[family-name:var(--font-jetbrains)] text-xs text-muted">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="font-medium">{item.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>

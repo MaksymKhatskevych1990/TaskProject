@@ -3,57 +3,48 @@ import { cn } from "@/lib/utils";
 
 export function PricingSection() {
   return (
-    <section id="pricing" className="relative py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 section-intro mx-auto max-w-2xl">
-          <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-            {SECTIONS.pricing.eyebrow}
-          </p>
-          <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
+    <section id="pricing" className="border-t border-[var(--card-border)] py-24 sm:py-32">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
+        <div className="mb-16 max-w-lg">
+          <p className="section-number mb-4">05</p>
+          <h2 className="editorial-heading text-3xl sm:text-4xl">
             {SECTIONS.pricing.title}
           </h2>
-          <p className="mt-3 text-sm text-muted">
-            {SECTIONS.pricing.subtitle}
-          </p>
+          <p className="mt-4 text-sm text-muted">{SECTIONS.pricing.subtitle}</p>
         </div>
 
-        <div className="grid items-end gap-5 lg:grid-cols-3">
-          {PRICING_PLANS.map((plan, index) => (
+        <div className="grid gap-px bg-[var(--card-border)] lg:grid-cols-3">
+          {PRICING_PLANS.map((plan) => (
             <article
               key={plan.name}
               className={cn(
-                "relative flex flex-col border p-6",
-                index % 2 === 0 ? "surface-card" : "surface-card-alt",
-                plan.highlighted
-                  ? "gradient-border border-transparent bg-card shadow-xl shadow-violet/10 lg:-translate-y-2"
-                  : "border-white/5 bg-card",
+                "flex flex-col bg-background p-8 sm:p-10",
+                plan.highlighted && "lg:-mt-4 lg:-mb-4 lg:bg-[var(--card)] lg:py-12",
               )}
             >
               {"badge" in plan && plan.badge && (
-                <span className="absolute -top-3 left-5 bg-gradient-to-r from-cyan to-violet px-3 py-1 font-[family-name:var(--font-jetbrains)] text-[10px] font-semibold uppercase tracking-wider text-[#070b18]">
+                <span className="label-mono mb-6 text-accent-warm-bright">
                   {plan.badge}
                 </span>
               )}
 
-              <h3 className="font-[family-name:var(--font-exo2)] text-xl font-semibold">
-                {plan.name}
-              </h3>
-              <p className="mt-1 text-sm text-muted">{plan.description}</p>
+              <h3 className="editorial-heading text-2xl">{plan.name}</h3>
+              <p className="mt-2 text-sm text-muted">{plan.description}</p>
 
-              <div className="mt-6">
-                <span className="text-sm text-muted">{SECTIONS.pricing.from} </span>
-                <span className="font-[family-name:var(--font-exo2)] text-3xl font-bold">
+              <div className="mt-8">
+                <span className="text-xs text-muted">{SECTIONS.pricing.from} </span>
+                <p className="font-[family-name:var(--font-exo2)] text-3xl font-bold tracking-tight">
                   {formatPrice(plan.price)}
-                </span>
+                </p>
               </div>
 
-              <ul className="mt-6 flex-1 space-y-3">
+              <ul className="mt-8 flex-1 space-y-3 border-t border-[var(--card-border)] pt-8">
                 {plan.features.map((feature) => (
                   <li
                     key={feature}
-                    className="flex items-start gap-2 text-sm text-muted"
+                    className="flex items-start gap-3 text-sm text-muted"
                   >
-                    <span className="mt-0.5 text-cyan">✓</span>
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-accent" />
                     {feature}
                   </li>
                 ))}
@@ -62,7 +53,7 @@ export function PricingSection() {
               <a
                 href={`?plan=${plan.slug}#contact`}
                 className={cn(
-                  "mt-8 block py-3 text-center text-sm font-semibold transition-opacity hover:opacity-90",
+                  "mt-10 block py-3 text-center text-sm font-semibold transition-colors",
                   plan.highlighted
                     ? "btn-primary w-full"
                     : "btn-secondary w-full",

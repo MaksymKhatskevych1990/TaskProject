@@ -5,15 +5,14 @@ import { SITE } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
 const emblemSizes = {
-  sm: "h-9 w-9",
-  md: "h-11 w-11",
-  lg: "h-20 w-20",
+  sm: "h-8 w-8",
+  md: "h-10 w-10",
+  lg: "h-16 w-16",
 } as const;
 
 type BrandLogoProps = {
   showText?: boolean;
   emblemSize?: keyof typeof emblemSizes;
-  /** Header: full chameleon fits inside the emblem box. */
   emblemVariant?: "default" | "header";
   className?: string;
 };
@@ -27,10 +26,10 @@ export function BrandLogo({
   const isHeaderEmblem = emblemVariant === "header";
 
   return (
-    <span className={cn("flex items-center gap-3", className)}>
+    <span className={cn("flex items-center gap-2.5", className)}>
       <span
         className={cn(
-          "relative shrink-0 overflow-hidden rounded-lg rounded-tr-none border border-cyan/25 bg-[#0a1020] shadow-lg shadow-cyan/15 ring-1 ring-white/10",
+          "relative shrink-0 overflow-hidden",
           emblemSizes[emblemSize],
         )}
         aria-hidden="true"
@@ -39,10 +38,10 @@ export function BrandLogo({
           src={isHeaderEmblem ? emblem : logo}
           alt=""
           fill
-          sizes={emblemSize === "lg" ? "80px" : "44px"}
+          sizes={emblemSize === "lg" ? "64px" : "40px"}
           className={
             isHeaderEmblem
-              ? "object-contain p-2"
+              ? "object-contain"
               : "scale-[2.2] object-cover object-[center_76%]"
           }
           priority
@@ -50,12 +49,12 @@ export function BrandLogo({
       </span>
 
       {showText ? (
-        <span className="leading-tight">
-          <span className="block font-[family-name:var(--font-exo2)] text-base font-bold tracking-tight text-foreground sm:text-lg">
+        <span className="leading-none">
+          <span className="block font-[family-name:var(--font-exo2)] text-[15px] font-bold tracking-tight text-foreground">
             {SITE.brandShort}
           </span>
-          <span className="block font-[family-name:var(--font-jetbrains)] text-[9px] uppercase tracking-[0.22em] text-cyan/90 sm:text-[10px]">
-            Digital Studio
+          <span className="mt-0.5 block font-[family-name:var(--font-jetbrains)] text-[8px] uppercase tracking-[0.2em] text-muted">
+            studio
           </span>
         </span>
       ) : null}

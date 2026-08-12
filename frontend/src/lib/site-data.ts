@@ -122,11 +122,9 @@ export function formatPrice(amount: number): string {
 
 export const NAV_LINKS = [
   { href: "/#services", label: "Послуги" },
-  { href: "/#portfolio", label: "Портфоліо" },
-  { href: "/#cases", label: "Кейси" },
+  { href: "/#portfolio", label: "Роботи" },
   { href: "/#pricing", label: "Ціни" },
   { href: "/blog", label: "Блог" },
-  { href: "/#faq", label: "FAQ" },
 ] as const;
 
 export const SECTIONS = {
@@ -157,22 +155,48 @@ export const SECTIONS = {
 } as const;
 
 export const HERO = {
-  badge: "Залишилось 2 місця у серпні — наступний потік у вересні",
-  title: "Запустимо ваш бізнес онлайн",
-  titleAccent: "за 14 днів",
-  subtitle:
-    "Дизайн, сайти, інтернет-магазини, SEO, Telegram-боти та автоматизація — під ключ з фіксованою ціною та гарантією результату.",
-  primaryCta: "Обговорити проєкт",
-  secondaryCta: "Дивитись портфоліо",
-  mockup: {
-    botLabel: "AI-бот",
-    botGreeting: "Вітаємо! Чим допомогти?",
-    userMessage: "Хочу сайт",
-  },
+  status: "2 вільні слоти",
+  statusMeta: "серпень · наступний потік — вересень",
+  title: "Що запускаємо?",
+  hint: "Оберіть задачу — одразу побачите термін, склад і ціну.",
+  primaryCta: "Забронювати слот",
+  secondaryCta: "Роботи",
+  conditions: [
+    "Ціна фіксується в договорі",
+    "2 раунди правок",
+    "30 днів підтримки після запуску",
+  ],
   chameleon: {
     ariaLabel: "Chameleon Digital Studio — наведи курсор, щоб хамелеон повернув голову",
   },
 } as const;
+
+export const HERO_BRIEF = [
+  {
+    id: "site",
+    label: "Сайт",
+    duration: "14 днів",
+    price: MARKET_PRICES.start,
+    plan: "start",
+    includes: "Структура, дизайн, верстка, форма заявок, базове SEO, запуск.",
+  },
+  {
+    id: "shop",
+    label: "Магазин",
+    duration: "3–4 тижні",
+    price: MARKET_PRICES.business,
+    plan: "business",
+    includes: "Каталог, оплата, доставка, CMS, аналітика, запуск під ключ.",
+  },
+  {
+    id: "bot",
+    label: "Telegram-бот",
+    duration: "3–4 тижні",
+    price: MARKET_PRICES.business,
+    plan: "business",
+    includes: "Сценарії, запис або замовлення, сповіщення, інтеграція з CRM.",
+  },
+] as const;
 
 export const STATS = [
   { value: 47, suffix: "+", label: "запущених проєктів" },
@@ -213,8 +237,6 @@ export const SERVICES = [
       "Mobile-first адаптив",
       "Анімації та мікровзаємодії",
     ],
-    icon: "🎨",
-    glow: "violet",
     featured: true,
   },
   {
@@ -227,8 +249,6 @@ export const SERVICES = [
       "Інтернет-магазини з оплатою та доставкою",
       "CMS, CRM та API-інтеграції",
     ],
-    icon: "🌐",
-    glow: "cyan",
     featured: true,
   },
   {
@@ -241,24 +261,18 @@ export const SERVICES = [
       "Оптимізація швидкості (Core Web Vitals)",
       "Google Analytics і Search Console",
     ],
-    icon: "📈",
-    glow: "green",
     featured: true,
   },
   {
     title: "Telegram-боти",
     description:
       "Запис, замовлення, сповіщення та інтеграції — автоматизація бізнес-процесів у месенджері.",
-    icon: "🤖",
-    glow: "cyan",
     featured: false,
   },
   {
     title: "Автоматизація",
     description:
       "CRM, таблиці, API та внутрішні інструменти — менше рутини, більше зростання.",
-    icon: "⚡",
-    glow: "orange",
     featured: false,
   },
 ] as const;
@@ -270,8 +284,8 @@ export const PORTFOLIO = [
     category: "E-commerce",
     description: "Інтернет-магазин косметики з каталогом, оплатою та інтеграцією доставки.",
     tags: ["Дизайн", "E-commerce", "SEO"],
-    gradient: "from-violet/60 to-cyan/40",
-    accent: "violet",
+    gradient: "from-emerald-900/60 to-emerald-700/30",
+    accent: "green",
   },
   {
     slug: "techflow-saas",
@@ -279,7 +293,7 @@ export const PORTFOLIO = [
     category: "Лендинг",
     description: "Продажний лендинг для B2B SaaS з A/B-тестами та аналітикою конверсій.",
     tags: ["UI/UX", "Розробка", "A/B"],
-    gradient: "from-cyan/50 to-blue-500/30",
+    gradient: "from-stone-800/60 to-stone-600/30",
     accent: "cyan",
   },
   {
@@ -288,8 +302,8 @@ export const PORTFOLIO = [
     category: "Telegram-бот",
     description: "Сайт салону краси та Telegram-бот для автозапису і нагадувань.",
     tags: ["Дизайн", "Бот", "CRM"],
-    gradient: "from-pink-500/40 to-violet/50",
-    accent: "violet",
+    gradient: "from-amber-900/50 to-amber-700/30",
+    accent: "orange",
   },
   {
     slug: "legal-partners",
@@ -297,7 +311,7 @@ export const PORTFOLIO = [
     category: "Корпоративний сайт",
     description: "Багатосторінковий сайт юридичної фірми з CMS та формами заявок.",
     tags: ["Дизайн", "CMS", "SEO"],
-    gradient: "from-slate-500/40 to-cyan/30",
+    gradient: "from-neutral-800/50 to-neutral-600/30",
     accent: "cyan",
   },
   {
@@ -306,7 +320,7 @@ export const PORTFOLIO = [
     category: "Лендинг + SEO",
     description: "Лендинг фітнес-клубу з технічним SEO та підключенням Google Analytics.",
     tags: ["Лендинг", "SEO", "Аналітика"],
-    gradient: "from-emerald-500/40 to-cyan/30",
+    gradient: "from-emerald-800/50 to-emerald-600/30",
     accent: "green",
   },
   {
@@ -427,22 +441,18 @@ export const GUARANTEES = [
   {
     title: "Фіксована ціна",
     description: "Вартість фіксується в договорі — без прихованих доплат.",
-    icon: "💰",
   },
   {
     title: "Термін 14 днів",
     description: "Стандартний проєкт запускаємо за два тижні.",
-    icon: "⏱️",
   },
   {
     title: "Правки включено",
     description: "2 раунди правок за дизайном і функціоналом — безкоштовно.",
-    icon: "✏️",
   },
   {
     title: "30 днів підтримки",
     description: "Виправляємо баги та допомагаємо з запуском після здачі.",
-    icon: "🛡️",
   },
 ] as const;
 

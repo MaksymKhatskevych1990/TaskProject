@@ -8,60 +8,57 @@ export function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="relative py-20">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="mb-12 section-intro">
-          <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-            {SECTIONS.faq.eyebrow}
-          </p>
-          <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
-            {SECTIONS.faq.title}
-          </h2>
-        </div>
+    <section id="faq" className="py-24 sm:py-32">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
+        <div className="grid gap-12 lg:grid-cols-[280px_1fr] lg:gap-20">
+          <div>
+            <p className="section-number mb-4">07</p>
+            <h2 className="editorial-heading text-3xl sm:text-4xl">
+              {SECTIONS.faq.title}
+            </h2>
+          </div>
 
-        <div className="space-y-2">
-          {FAQ_ITEMS.map((item, index) => {
-            const isOpen = openIndex === index;
+          <div>
+            {FAQ_ITEMS.map((item, index) => {
+              const isOpen = openIndex === index;
 
-            return (
-              <div
-                key={item.question}
-                className={cn(
-                  "overflow-hidden border border-white/5 bg-card",
-                  index % 2 === 0 ? "surface-card" : "surface-card-alt",
-                )}
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenIndex(isOpen ? null : index)}
-                  className="flex w-full items-center justify-between px-6 py-4 text-left"
-                  aria-expanded={isOpen}
+              return (
+                <div
+                  key={item.question}
+                  className="border-t border-[var(--card-border)]"
                 >
-                  <span className="font-medium">{item.question}</span>
-                  <span
+                  <button
+                    type="button"
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                    className="flex w-full items-start justify-between gap-6 py-6 text-left"
+                    aria-expanded={isOpen}
+                  >
+                    <span className="text-base font-medium">{item.question}</span>
+                    <span
+                      className={cn(
+                        "mt-1 shrink-0 font-[family-name:var(--font-jetbrains)] text-sm text-muted transition-transform duration-300",
+                        isOpen && "rotate-45 text-accent",
+                      )}
+                    >
+                      +
+                    </span>
+                  </button>
+                  <div
                     className={cn(
-                      "ml-4 shrink-0 text-cyan transition-transform duration-300",
-                      isOpen && "rotate-45",
+                      "grid transition-all duration-300 ease-in-out",
+                      isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
                     )}
                   >
-                    +
-                  </span>
-                </button>
-                <div
-                  className={cn(
-                    "grid transition-all duration-300 ease-in-out",
-                    isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]",
-                  )}
-                >
-                  <div className="overflow-hidden">
-                    <p className="px-6 pb-4 text-sm leading-relaxed text-muted">
-                      {item.answer}
-                    </p>
+                    <div className="overflow-hidden">
+                      <p className="pb-6 text-sm leading-relaxed text-muted">
+                        {item.answer}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

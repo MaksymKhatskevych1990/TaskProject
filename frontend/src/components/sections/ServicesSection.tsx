@@ -1,97 +1,75 @@
 import { SECTIONS, SERVICES } from "@/lib/site-data";
-import { cn } from "@/lib/utils";
-
-const glowClasses = {
-  cyan: "hover:border-cyan/40 hover:shadow-cyan/10",
-  violet: "hover:border-violet/40 hover:shadow-violet/10",
-  green: "hover:border-emerald-400/40 hover:shadow-emerald-400/10",
-  orange: "hover:border-orange-400/40 hover:shadow-orange-400/10",
-} as const;
 
 const featuredServices = SERVICES.filter((service) => service.featured);
 const additionalServices = SERVICES.filter((service) => !service.featured);
 
 export function ServicesSection() {
   return (
-    <section id="services" className="relative py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 section-intro">
-          <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-            {SECTIONS.services.eyebrow}
-          </p>
-          <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
-            {SECTIONS.services.title}
-          </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
-            {SECTIONS.services.subtitle}
-          </p>
-        </div>
-
-        <div className="grid gap-5 lg:grid-cols-3">
-          {featuredServices.map((service, index) => (
-            <article
-              key={service.title}
-              className={cn(
-                "group flex flex-col border border-white/5 bg-card p-6 transition-all duration-300 hover:shadow-lg",
-                index % 2 === 0 ? "surface-card" : "surface-card-alt",
-                glowClasses[service.glow as keyof typeof glowClasses],
-              )}
-            >
-              <span aria-hidden="true" className="text-3xl">
-                {service.icon}
-              </span>
-              <h3 className="mt-4 font-[family-name:var(--font-exo2)] text-xl font-semibold">
-                {service.title}
-              </h3>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
-                {service.description}
-              </p>
-              {"features" in service && service.features && (
-                <ul className="mt-5 flex-1 space-y-2.5 border-t border-white/5 pt-5">
-                  {service.features.map((feature) => (
-                    <li
-                      key={feature}
-                      className="flex items-start gap-2 text-sm text-muted"
-                    >
-                      <span className="mt-0.5 text-cyan">✓</span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </article>
-          ))}
-        </div>
-
-        {additionalServices.length > 0 && (
-          <div className="mt-14">
-            <p className="mb-6 font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-muted">
-              {SECTIONS.services.also}
+    <section id="services" className="py-24 sm:py-32">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
+        <div className="grid gap-12 lg:grid-cols-[280px_1fr] lg:gap-20">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <p className="section-number mb-4">01</p>
+            <h2 className="editorial-heading text-3xl sm:text-4xl">
+              {SECTIONS.services.title}
+            </h2>
+            <p className="mt-4 text-sm leading-relaxed text-muted">
+              {SECTIONS.services.subtitle}
             </p>
-            <div className="grid max-w-3xl gap-5 sm:grid-cols-2">
-              {additionalServices.map((service, index) => (
-                <article
-                  key={service.title}
-                  className={cn(
-                    "group border border-white/5 bg-card p-6 transition-all duration-300 hover:shadow-lg",
-                    index === 0 ? "surface-card-alt" : "surface-card",
-                    glowClasses[service.glow as keyof typeof glowClasses],
-                  )}
-                >
-                  <span aria-hidden="true" className="text-3xl">
-                    {service.icon}
-                  </span>
-                  <h3 className="mt-4 font-[family-name:var(--font-exo2)] text-lg font-semibold">
-                    {service.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {service.description}
-                  </p>
-                </article>
-              ))}
-            </div>
           </div>
-        )}
+
+          <div className="space-y-0">
+            {featuredServices.map((service, index) => (
+              <article
+                key={service.title}
+                className="group border-t border-[var(--card-border)] py-10 first:border-t-0 first:pt-0"
+              >
+                <div className="grid gap-6 sm:grid-cols-[auto_1fr] sm:gap-10">
+                  <span className="section-number pt-1">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div>
+                    <h3 className="editorial-heading text-xl sm:text-2xl">
+                      {service.title}
+                    </h3>
+                    <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted">
+                      {service.description}
+                    </p>
+                    {"features" in service && service.features && (
+                      <ul className="mt-6 grid gap-2 sm:grid-cols-2">
+                        {service.features.map((feature) => (
+                          <li
+                            key={feature}
+                            className="flex items-start gap-2 text-sm text-muted"
+                          >
+                            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-accent" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </div>
+              </article>
+            ))}
+
+            {additionalServices.length > 0 && (
+              <div className="border-t border-[var(--card-border)] pt-10">
+                <p className="label-mono mb-8">{SECTIONS.services.also}</p>
+                <div className="grid gap-8 sm:grid-cols-2">
+                  {additionalServices.map((service) => (
+                    <article key={service.title}>
+                      <h3 className="text-base font-semibold">{service.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-muted">
+                        {service.description}
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );

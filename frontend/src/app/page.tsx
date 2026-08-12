@@ -12,8 +12,6 @@ import { PricingSection } from "@/components/sections/PricingSection";
 import { ProcessSection } from "@/components/sections/ProcessSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { SocialProofSection } from "@/components/sections/SocialProofSection";
-import { SectionScrollSnap } from "@/components/ui/SectionScrollSnap";
-import { SnapSection } from "@/components/ui/SnapSection";
 import { buildHomePageGraph, buildSchemaGraph } from "@/lib/seo/schema";
 
 export default function HomePage() {
@@ -22,45 +20,21 @@ export default function HomePage() {
   return (
     <>
       <JsonLd data={homeSchema} />
-      <SectionScrollSnap>
       <Header />
       <main>
-        <SnapSection>
-          <HeroSection />
-        </SnapSection>
-        <SnapSection>
-          <SocialProofSection />
-        </SnapSection>
-        <SnapSection>
-          <ServicesSection />
-        </SnapSection>
-        <SnapSection>
-          <PortfolioSection />
-        </SnapSection>
-        <SnapSection>
-          <CaseStudiesSection />
-        </SnapSection>
-        <SnapSection>
-          <ProcessSection />
-        </SnapSection>
-        <SnapSection>
-          <PricingSection />
-        </SnapSection>
-        <SnapSection>
-          <GuaranteesSection />
-        </SnapSection>
-        <SnapSection>
-          <FAQSection />
-        </SnapSection>
-        <SnapSection>
-          <ContactSection />
-        </SnapSection>
+        <HeroSection />
+        <SocialProofSection />
+        <ServicesSection />
+        <PortfolioSection />
+        <CaseStudiesSection />
+        <ProcessSection />
+        <PricingSection />
+        <GuaranteesSection />
+        <FAQSection />
+        <ContactSection />
       </main>
-      <SnapSection>
-        <Footer />
-      </SnapSection>
+      <Footer />
       <FloatingTelegramButton />
-    </SectionScrollSnap>
     </>
   );
 }

@@ -1,62 +1,42 @@
 import { CASES, SECTIONS } from "@/lib/site-data";
-import { cn } from "@/lib/utils";
 
 export function CaseStudiesSection() {
   return (
-    <section id="cases" className="relative py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 section-intro">
-          <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-            {SECTIONS.cases.eyebrow}
-          </p>
-          <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
-            {SECTIONS.cases.title}
-          </h2>
+    <section id="cases" className="bg-[var(--card)] py-24 sm:py-32">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
+        <div className="mb-16 flex items-end justify-between gap-8">
+          <div>
+            <p className="section-number mb-4">03</p>
+            <h2 className="editorial-heading text-3xl sm:text-4xl">
+              {SECTIONS.cases.title}
+            </h2>
+          </div>
         </div>
 
-        <div className="grid gap-5 md:grid-cols-3 md:items-stretch">
+        <div className="space-y-0">
           {CASES.map((item, index) => (
             <article
               key={item.title}
-              className={cn(
-                "flex h-full min-h-[22rem] flex-col border border-white/5 bg-card p-6",
-                index % 2 === 0 ? "surface-card" : "surface-card-alt",
-              )}
+              className="grid gap-6 border-t border-[var(--card-border)] py-12 sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-12"
             >
-              <span aria-hidden="true" className="block h-8 shrink-0 text-3xl leading-none">
-                {item.emoji}
-              </span>
+              <div className={index % 2 === 1 ? "sm:order-3 sm:text-right" : ""}>
+                <p className="label-mono mb-2">{SECTIONS.cases.before}</p>
+                <p className="text-lg text-muted line-through decoration-[var(--card-border)]">
+                  {item.before}
+                </p>
+              </div>
 
-              <h3 className="mt-4 line-clamp-2 h-14 shrink-0 font-[family-name:var(--font-exo2)] text-lg font-semibold leading-snug">
-                {item.title}
-              </h3>
+              <div className="text-center sm:order-2">
+                <p className="font-[family-name:var(--font-exo2)] text-4xl font-bold tracking-tight accent-warm-text sm:text-5xl">
+                  {item.metric}
+                </p>
+                <p className="mt-2 text-xs text-muted">{item.title}</p>
+              </div>
 
-              <p className="mt-2 line-clamp-3 h-[4.125rem] shrink-0 text-sm leading-relaxed text-muted">
-                {item.description}
-              </p>
-
-              <div className="mt-auto shrink-0 pt-6">
-                <div className="grid h-[4.25rem] grid-cols-3 items-center gap-2 rounded-xl bg-white/5 px-3">
-                  <div className="min-w-0">
-                    <p className="font-[family-name:var(--font-jetbrains)] text-[10px] uppercase text-muted">
-                      {SECTIONS.cases.before}
-                    </p>
-                    <p className="mt-1 truncate text-sm leading-tight">{item.before}</p>
-                  </div>
-
-                  <p className="gradient-text text-center font-[family-name:var(--font-exo2)] text-xl font-bold leading-none">
-                    {item.metric}
-                  </p>
-
-                  <div className="min-w-0 text-right">
-                    <p className="font-[family-name:var(--font-jetbrains)] text-[10px] uppercase text-muted">
-                      {SECTIONS.cases.after}
-                    </p>
-                    <p className="mt-1 truncate text-sm font-medium leading-tight text-cyan">
-                      {item.after}
-                    </p>
-                  </div>
-                </div>
+              <div className={index % 2 === 1 ? "sm:order-1" : "sm:text-right"}>
+                <p className="label-mono mb-2">{SECTIONS.cases.after}</p>
+                <p className="text-lg font-medium accent-text">{item.after}</p>
+                <p className="mt-2 text-sm text-muted">{item.description}</p>
               </div>
             </article>
           ))}

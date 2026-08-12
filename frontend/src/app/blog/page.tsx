@@ -26,24 +26,22 @@ export default async function BlogPage() {
     <>
       <JsonLd data={blogSchema} />
       <Header />
-      <main className="pt-24 pb-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="mb-12 text-center">
-            <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-              {BLOG_PAGE.eyebrow}
-            </p>
-            <h1 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl lg:text-5xl">
+      <main className="pt-28 pb-20">
+        <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
+          <div className="mb-16 max-w-lg">
+            <p className="label-mono mb-4">{BLOG_PAGE.eyebrow}</p>
+            <h1 className="editorial-heading text-3xl sm:text-4xl lg:text-5xl">
               {BLOG_PAGE.title}
             </h1>
-            <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+            <p className="mt-4 text-sm leading-relaxed text-muted">
               {BLOG_PAGE.subtitle}
             </p>
           </div>
 
           {posts.length === 0 ? (
-            <p className="text-center text-sm text-muted">{BLOG_PAGE.empty}</p>
+            <p className="text-sm text-muted">{BLOG_PAGE.empty}</p>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-x-8 sm:grid-cols-2 lg:grid-cols-3">
               {featured ? <BlogCard post={featured} featured /> : null}
               {rest.map((post) => (
                 <BlogCard key={post.slug} post={post} />

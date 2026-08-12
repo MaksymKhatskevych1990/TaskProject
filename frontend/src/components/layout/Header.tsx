@@ -8,6 +8,13 @@ import { cn } from "@/lib/utils";
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
@@ -19,114 +26,119 @@ export function Header() {
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-[#070b18]/80 backdrop-blur-xl">
-      <div className="mx-auto flex h-16 max-w-6xl items-center gap-6 px-4 sm:px-6">
+    <header
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 transition-all duration-500",
+        scrolled
+          ? "border-b border-[var(--card-border)] bg-background/90 backdrop-blur-md"
+          : "bg-transparent",
+      )}
+    >
+      <div className="mx-auto flex h-[4.5rem] max-w-[90rem] items-center justify-between px-5 sm:px-8 lg:px-12">
         <Link
           href="/"
           className="flex shrink-0 items-center"
           onClick={closeMenu}
           aria-label={`${SITE.brand} — на головну`}
         >
-          <BrandLogo emblemVariant="header" />
+          <BrandLogo emblemVariant="header" emblemSize="sm" />
         </Link>
 
-        <nav className="hidden flex-1 items-center gap-7 md:flex" aria-label={HEADER.navigation}>
-          {NAV_LINKS.map((link, index) => (
+        <nav
+          className="hidden items-center gap-8 md:flex"
+          aria-label={HEADER.navigation}
+        >
+          {NAV_LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="nav-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/50"
+              className="nav-link focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent/50"
             >
-              <span className="mr-1.5 font-[family-name:var(--font-jetbrains)] text-[10px] text-cyan/50">
-                {String(index + 1).padStart(2, "0")}
-              </span>
               {link.label}
             </Link>
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-3 md:gap-4">
+        <div className="flex items-center gap-4">
           <Link
             href="/#contact"
-            className="btn-primary hidden px-4 py-2 sm:inline-flex"
+            className="btn-primary hidden px-5 py-2.5 text-[13px] sm:inline-flex"
           >
             {HERO.primaryCta}
           </Link>
 
           <button
             type="button"
-            className="inline-flex h-10 w-10 items-center justify-center rounded-lg rounded-tr-none border border-white/10 text-foreground md:hidden"
+            className="flex flex-col items-end gap-[5px] p-2 md:hidden"
             aria-expanded={menuOpen}
             aria-controls="mobile-nav"
             aria-label={menuOpen ? HEADER.closeMenu : HEADER.openMenu}
             onClick={() => setMenuOpen((open) => !open)}
           >
-            <span className="sr-only">{menuOpen ? HEADER.closeMenu : HEADER.openMenu}</span>
-            <svg
-              aria-hidden="true"
-              className="h-5 w-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              {menuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            <span
+              className={cn(
+                "block h-px w-6 bg-foreground transition-all duration-300",
+                menuOpen && "translate-y-[6px] rotate-45",
               )}
-            </svg>
+            />
+            <span
+              className={cn(
+                "block h-px w-4 bg-foreground transition-all duration-300",
+                menuOpen && "opacity-0",
+              )}
+            />
+            <span
+              className={cn(
+                "block h-px w-6 bg-foreground transition-all duration-300",
+                menuOpen && "-translate-y-[6px] -rotate-45",
+              )}
+            />
           </button>
         </div>
       </div>
 
       <div
         className={cn(
-          "fixed inset-0 top-16 z-40 md:hidden",
-          menuOpen ? "pointer-events-auto" : "pointer-events-none",
+          "fixed inset-0 z-40 bg-background transition-all duration-500 md:hidden",
+          menuOpen
+            ? "pointer-events-auto opacity-100"
+            : "pointer-events-none opacity-0",
         )}
         aria-hidden={!menuOpen}
       >
-        <button
-          type="button"
-          className={cn(
-            "absolute inset-0 bg-[#070b18]/80 transition-opacity duration-300",
-            menuOpen ? "opacity-100" : "opacity-0",
-          )}
-          aria-label={HEADER.closeMenu}
-          onClick={closeMenu}
-        />
-
         <nav
           id="mobile-nav"
-          className={cn(
-            "relative border-b border-white/5 bg-[#0d1224] px-4 py-4 shadow-2xl transition-all duration-300",
-            menuOpen ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0",
-          )}
+          className="flex h-full flex-col justify-center px-8"
           aria-label={HEADER.navigation}
         >
-          <ul className="space-y-1">
-            {NAV_LINKS.map((link) => (
+          <ul className="space-y-6">
+            {NAV_LINKS.map((link, index) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
                   onClick={closeMenu}
-                  className="block rounded-lg rounded-tr-none px-4 py-3 text-base font-medium text-foreground transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan/50"
+                  className="group flex items-baseline gap-4"
                 >
-                  {link.label}
+                  <span className="section-number opacity-40">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="editorial-heading text-3xl text-foreground transition-colors group-hover:text-accent-bright">
+                    {link.label}
+                  </span>
                 </Link>
               </li>
             ))}
-            <li className="pt-2">
-              <Link
-                href="/#contact"
-                onClick={closeMenu}
-                className="btn-primary block w-full py-3 text-center"
-              >
-                {HERO.primaryCta}
-              </Link>
-            </li>
           </ul>
+
+          <div className="mt-16">
+            <Link
+              href="/#contact"
+              onClick={closeMenu}
+              className="btn-primary px-8 py-3.5"
+            >
+              {HERO.primaryCta}
+            </Link>
+          </div>
         </nav>
       </div>
     </header>

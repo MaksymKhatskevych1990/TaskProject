@@ -16,7 +16,7 @@ export default function RootLayout({
 
   return (
     <html lang="uk" className={`${exo2.variable} ${dmSans.variable} ${jetbrains.variable} h-full`}>
-      <body className="dot-grid min-h-full antialiased">
+      <body className="min-h-full antialiased">
         <JsonLd data={globalSchema} />
         {children}
       </body>

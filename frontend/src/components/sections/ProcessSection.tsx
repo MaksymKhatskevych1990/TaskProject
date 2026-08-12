@@ -2,33 +2,36 @@ import { PROCESS_STEPS, SECTIONS } from "@/lib/site-data";
 
 export function ProcessSection() {
   return (
-    <section className="relative py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-12 section-intro">
-          <p className="font-[family-name:var(--font-jetbrains)] text-xs uppercase tracking-widest text-cyan">
-            {SECTIONS.process.eyebrow}
-          </p>
-          <h2 className="mt-3 font-[family-name:var(--font-exo2)] text-3xl font-bold sm:text-4xl">
-            {SECTIONS.process.title}
-          </h2>
-        </div>
+    <section id="process" className="py-24 sm:py-32">
+      <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
+        <div className="grid gap-16 lg:grid-cols-[280px_1fr] lg:gap-20">
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            <p className="section-number mb-4">04</p>
+            <h2 className="editorial-heading text-3xl sm:text-4xl">
+              {SECTIONS.process.title}
+            </h2>
+            <p className="mt-4 text-sm text-muted">
+              Від першого дзвінка до запуску — прозорий процес без сюрпризів.
+            </p>
+          </div>
 
-        <div className="relative ml-auto max-w-2xl lg:mr-8">
-          <div className="absolute left-6 top-0 bottom-0 w-px bg-gradient-to-b from-cyan via-violet to-transparent" />
-
-          <div className="space-y-8">
-            {PROCESS_STEPS.map((step) => (
-              <div key={step.step} className="relative flex gap-6 pl-2">
-                <div className="relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-lg rounded-tr-none border border-cyan/30 bg-[#070b18] font-[family-name:var(--font-exo2)] text-sm font-bold text-cyan shadow-lg shadow-cyan/20">
-                  {step.step}
-                </div>
-                <div className="pb-2 pt-1">
-                  <h3 className="font-[family-name:var(--font-exo2)] text-lg font-semibold">
-                    {step.title}
-                  </h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted">
+          <div>
+            {PROCESS_STEPS.map((step, index) => (
+              <div
+                key={step.step}
+                className="relative grid grid-cols-[3rem_1fr] gap-6 border-t border-[var(--card-border)] py-10 first:border-t-0 first:pt-0"
+              >
+                <span className="font-[family-name:var(--font-jetbrains)] text-sm text-accent">
+                  {String(step.step).padStart(2, "0")}
+                </span>
+                <div>
+                  <h3 className="text-lg font-semibold">{step.title}</h3>
+                  <p className="mt-2 max-w-md text-sm leading-relaxed text-muted">
                     {step.description}
                   </p>
+                  {index < PROCESS_STEPS.length - 1 && (
+                    <div className="absolute left-[1.125rem] top-[3.5rem] h-[calc(100%-2rem)] w-px bg-[var(--card-border)]" />
+                  )}
                 </div>
               </div>
             ))}

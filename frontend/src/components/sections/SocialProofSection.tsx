@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { RevealOnScroll } from "@/components/ui/RevealOnScroll";
 import { STATS, TESTIMONIALS } from "@/lib/site-data";
-import { cn } from "@/lib/utils";
 
 function AnimatedCounter({
   value,
@@ -26,7 +24,7 @@ function AnimatedCounter({
       ([entry]) => {
         if (entry.isIntersecting && !started.current) {
           started.current = true;
-          const duration = 1500;
+          const duration = 1200;
           const start = performance.now();
 
           const tick = (now: number) => {
@@ -50,53 +48,56 @@ function AnimatedCounter({
     decimals > 0 ? count.toFixed(decimals) : Math.round(count).toString();
 
   return (
-    <span ref={ref} className="gradient-text font-[family-name:var(--font-exo2)] text-4xl font-bold sm:text-5xl">
+    <span
+      ref={ref}
+      className="font-[family-name:var(--font-exo2)] text-3xl font-bold tracking-tight sm:text-4xl"
+    >
       {display}
-      {suffix}
+      <span className="accent-text">{suffix}</span>
     </span>
   );
 }
 
 export function SocialProofSection() {
+  const featured = TESTIMONIALS[0];
+
   return (
-    <section className="relative py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <RevealOnScroll>
-          <div className="flex flex-wrap divide-x divide-white/10 border-y border-white/10">
+    <section className="border-y border-[var(--card-border)]">
+      <div className="mx-auto max-w-[90rem] px-5 py-16 sm:px-8 lg:px-12">
+        <div className="grid gap-12 lg:grid-cols-[1.2fr_1fr] lg:gap-20">
+          <blockquote>
+            <p className="pull-quote text-foreground">
+              &ldquo;{featured.text}&rdquo;
+            </p>
+            <footer className="mt-6 flex items-baseline gap-3">
+              <cite className="not-italic text-sm font-medium">{featured.name}</cite>
+              <span className="text-xs text-muted">— {featured.role}</span>
+            </footer>
+          </blockquote>
+
+          <div className="grid grid-cols-2 gap-x-8 gap-y-10 border-l border-[var(--card-border)] pl-8 lg:pl-12">
             {STATS.map((stat) => (
-              <div key={stat.label} className="min-w-[50%] flex-1 px-4 py-8 text-left sm:min-w-0 sm:px-6">
+              <div key={stat.label}>
                 <AnimatedCounter
                   value={stat.value}
                   suffix={stat.suffix}
                   decimals={"decimals" in stat ? stat.decimals : 0}
                 />
-                <p className="mt-2 max-w-[10rem] text-sm text-muted">{stat.label}</p>
+                <p className="mt-1.5 text-xs leading-snug text-muted">{stat.label}</p>
               </div>
             ))}
           </div>
-        </RevealOnScroll>
+        </div>
+      </div>
 
-        <div className="mt-16 grid gap-5 md:grid-cols-3">
-          {TESTIMONIALS.map((item, index) => (
-            <RevealOnScroll key={item.name} delayMs={index * 100}>
-              <article
-                className={cn(
-                  "h-full border border-white/5 bg-card p-6 transition-colors hover:border-white/10",
-                  index % 2 === 0 ? "surface-card" : "surface-card-alt",
-                )}
-              >
-              <div className="mb-3 text-amber-400">
-                {"★".repeat(item.rating)}
-              </div>
-              <p className="mb-4 text-sm leading-relaxed text-muted">
-                &ldquo;{item.text}&rdquo;
-              </p>
-              <div>
-                <p className="font-medium">{item.name}</p>
-                <p className="text-xs text-muted">{item.role}</p>
-              </div>
-            </article>
-            </RevealOnScroll>
+      <div className="overflow-hidden border-t border-[var(--card-border)] py-4">
+        <div className="animate-marquee flex w-max gap-16 whitespace-nowrap px-8">
+          {[...TESTIMONIALS, ...TESTIMONIALS].map((item, i) => (
+            <span key={`${item.name}-${i}`} className="flex items-center gap-4 text-sm text-muted">
+              <span className="accent-text">—</span>
+              <span>&ldquo;{item.text}&rdquo;</span>
+              <span className="text-xs">· {item.name}</span>
+            </span>
           ))}
         </div>
       </div>
