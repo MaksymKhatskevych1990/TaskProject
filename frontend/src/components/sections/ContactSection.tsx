@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { FormEvent, useEffect, useState } from "react";
 import { buildTelegramContactUrl, submitContact } from "@/lib/contact";
 import { CONTACT, HERO_BRIEF, PRICING_PLANS, SITE } from "@/lib/site-data";
+import order from "@/image/order.png";
 
 export function ContactSection() {
   const [submitted, setSubmitted] = useState(false);
@@ -57,19 +59,19 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="border-t border-[var(--card-border)] bg-[var(--card)] py-24 sm:py-32">
+    <section id="contact" className="overflow-hidden border-t border-[var(--card-border)] py-20 sm:py-28">
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
-        <div className="grid gap-16 lg:grid-cols-2 lg:gap-24">
-          <div>
+        <div className="grid items-end gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)_minmax(0,0.95fr)] lg:gap-6 xl:gap-10">
+          <div className="lg:pb-8">
             <p className="section-number mb-4">08</p>
-            <h2 className="editorial-heading text-3xl sm:text-4xl">
+            <h2 className="editorial-heading text-3xl sm:text-4xl lg:text-[2.75rem]">
               {CONTACT.title}
             </h2>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
               {CONTACT.subtitle}
             </p>
 
-            <div className="mt-12 space-y-4 text-sm">
+            <div className="mt-10 space-y-3 text-sm">
               <a
                 href={SITE.telegramUrl}
                 target="_blank"
@@ -87,7 +89,16 @@ export function ContactSection() {
             </div>
           </div>
 
-          <div>
+          <div className="relative mx-auto w-full max-w-[420px] lg:max-w-none lg:-mb-8">
+            <Image
+              src={order}
+              alt="Chameleon з брифом проєкту"
+              className="h-auto w-full object-contain object-bottom mix-blend-lighten"
+              sizes="(max-width: 1024px) 420px, 40vw"
+            />
+          </div>
+
+          <div className="lg:pb-8">
             {submitted ? (
               <div className="border-l-2 border-accent py-4 pl-6">
                 <h3 className="text-xl font-semibold">{CONTACT.successTitle}</h3>

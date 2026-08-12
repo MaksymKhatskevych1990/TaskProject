@@ -1,17 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { HEADER, HERO, NAV_LINKS, SITE } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
 export function Header() {
+  const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [pastHero, setPastHero] = useState(false);
+  const showHeaderCta = pathname !== "/" || pastHero;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 60);
+      setPastHero(window.scrollY > window.innerHeight * 0.75);
+    };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -62,7 +70,14 @@ export function Header() {
         <div className="flex items-center gap-4">
           <Link
             href="/#contact"
-            className="btn-primary hidden px-5 py-2.5 text-[13px] sm:inline-flex"
+            className={cn(
+              "btn-primary hidden px-5 py-2.5 text-[13px] transition-all duration-300 sm:inline-flex",
+              showHeaderCta
+                ? "translate-y-0 opacity-100"
+                : "pointer-events-none translate-y-1 opacity-0",
+            )}
+            tabIndex={showHeaderCta ? 0 : -1}
+            aria-hidden={!showHeaderCta}
           >
             {HERO.primaryCta}
           </Link>

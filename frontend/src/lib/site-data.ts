@@ -135,7 +135,14 @@ export const SECTIONS = {
       "Дизайн, розробка та просування — три напрямки, які закривають повний цикл вашого digital-проєкту.",
     also: "Також",
   },
-  cases: { eyebrow: "Кейси", title: "Результати клієнтів", before: "Було", after: "Стало" },
+  cases: {
+    eyebrow: "Кейси",
+    title: "Результати клієнтів",
+    subtitle: "Одна схема для кожного кейсу: що було, що стало і який ефект.",
+    before: "Було",
+    after: "Стало",
+    result: "Результат",
+  },
   portfolio: {
     eyebrow: "Портфоліо",
     title: "Наші роботи",
@@ -336,28 +343,31 @@ export const PORTFOLIO = [
 
 export const CASES = [
   {
-    title: "E-commerce: зростання продажів",
-    emoji: "📈",
+    category: "E-commerce",
+    title: "Інтернет-магазин косметики",
     before: "12 замовлень/міс",
     after: "89 замовлень/міс",
     metric: "+640%",
-    description: "Інтернет-магазин косметики з інтеграцією оплати та доставки.",
+    metricLabel: "продажів",
+    description: "Інтеграція оплати, доставки та каталогу.",
   },
   {
-    title: "Telegram-бот для салону",
-    emoji: "💅",
+    category: "Telegram-бот",
+    title: "Салон краси",
     before: "15 дзвінків/день",
     after: "3 дзвінки/день",
-    metric: "-80%",
+    metric: "−80%",
+    metricLabel: "дзвінків на ресепшн",
     description: "Автозапис, нагадування та upsell через бота.",
   },
   {
-    title: "Лендинг для SaaS",
-    emoji: "🚀",
-    before: "1.2% CR",
-    after: "4.8% CR",
+    category: "Лендинг",
+    title: "SaaS-продукт",
+    before: "1.2% конверсія",
+    after: "4.8% конверсія",
     metric: "×4",
-    description: "Перезапуск лендингу з A/B-тестами та новим позиціонуванням.",
+    metricLabel: "конверсія",
+    description: "Перезапуск з A/B-тестами та новим позиціонуванням.",
   },
 ] as const;
 
@@ -441,18 +451,22 @@ export const GUARANTEES = [
   {
     title: "Фіксована ціна",
     description: "Вартість фіксується в договорі — без прихованих доплат.",
+    image: "price",
   },
   {
     title: "Термін 14 днів",
     description: "Стандартний проєкт запускаємо за два тижні.",
+    image: "term",
   },
   {
     title: "Правки включено",
     description: "2 раунди правок за дизайном і функціоналом — безкоштовно.",
+    image: "edits",
   },
   {
     title: "30 днів підтримки",
     description: "Виправляємо баги та допомагаємо з запуском після здачі.",
+    image: "support",
   },
 ] as const;
 
