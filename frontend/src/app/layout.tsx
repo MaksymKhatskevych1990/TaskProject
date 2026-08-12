@@ -1,22 +1,25 @@
 import type { Metadata } from "next";
 import { dmSans, exo2, jetbrains } from "@/app/fonts";
-import { SITE } from "@/lib/site-data";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { buildSchemaGraph, buildWebSiteNode, buildOrganizationNode } from "@/lib/seo/schema";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: `${SITE.brand} — IT-студія | Сайти, магазини, Telegram-боти`,
-  description:
-    "Запустимо ваш бізнес онлайн за 14 днів. Сайти, інтернет-магазини, Telegram-боти та автоматизація під ключ.",
-};
+export const metadata: Metadata = createPageMetadata();
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const globalSchema = buildSchemaGraph([buildOrganizationNode(), buildWebSiteNode()]);
+
   return (
     <html lang="uk" className={`${exo2.variable} ${dmSans.variable} ${jetbrains.variable} h-full`}>
-      <body className="dot-grid min-h-full antialiased">{children}</body>
+      <body className="dot-grid min-h-full antialiased">
+        <JsonLd data={globalSchema} />
+        {children}
+      </body>
     </html>
   );
 }

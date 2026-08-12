@@ -2,24 +2,29 @@ import type { Metadata } from "next";
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { BlogCard } from "@/components/blog/BlogCard";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { FloatingTelegramButton } from "@/components/sections/FloatingTelegramButton";
 import { getBlogPosts } from "@/lib/blog-api";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { buildBlogListGraph, buildSchemaGraph } from "@/lib/seo/schema";
 import { BLOG_PAGE, SITE } from "@/lib/site-data";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: `Блог — ${SITE.brand}`,
-  description:
-    `Поради з дизайну, розробки сайтів та SEO від команди ${SITE.brandShort}. Корисні матеріали для бізнесу.`,
-};
+  description: `Поради з дизайну, розробки сайтів та SEO від команди ${SITE.brandShort}. Корисні матеріали для бізнесу.`,
+  path: "/blog",
+});
 
 export default async function BlogPage() {
   const posts = await getBlogPosts();
   const [featured, ...rest] = posts;
+  const blogSchema = buildSchemaGraph(buildBlogListGraph(posts));
 
   return (
     <>
+      <JsonLd data={blogSchema} />
       <Header />
       <main className="pt-24 pb-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">

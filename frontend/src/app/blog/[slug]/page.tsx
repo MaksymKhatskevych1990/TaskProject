@@ -5,8 +5,11 @@ import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
 import { FloatingTelegramButton } from "@/components/sections/FloatingTelegramButton";
 import { ArticleContent } from "@/components/blog/ArticleContent";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { formatBlogDate, getBlogPost } from "@/lib/blog-api";
-import { BLOG_PAGE, SITE } from "@/lib/site-data";
+import { createPageMetadata } from "@/lib/seo/metadata";
+import { buildBlogPostGraph, buildSchemaGraph } from "@/lib/seo/schema";
+import { BLOG_PAGE } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
 const categoryColors: Record<string, string> = {
@@ -27,10 +30,13 @@ export async function generateMetadata({
   const post = await getBlogPost(slug);
   if (!post) return { title: "Стаття не знайдена" };
 
-  return {
-    title: `${post.title} — ${SITE.brand}`,
+  return createPageMetadata({
+    title: post.title,
     description: post.excerpt,
-  };
+    path: `/blog/${post.slug}`,
+    type: "article",
+    publishedTime: post.date,
+  });
 }
 
 export default async function BlogPostPage({
@@ -42,8 +48,11 @@ export default async function BlogPostPage({
   const post = await getBlogPost(slug);
   if (!post) notFound();
 
+  const articleSchema = buildSchemaGraph(buildBlogPostGraph(post));
+
   return (
     <>
+      <JsonLd data={articleSchema} />
       <Header />
       <main className="pt-24 pb-20">
         <article className="mx-auto max-w-3xl px-4 sm:px-6">

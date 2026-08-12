@@ -1,5 +1,6 @@
 import { Footer } from "@/components/layout/Footer";
 import { Header } from "@/components/layout/Header";
+import { JsonLd } from "@/components/seo/JsonLd";
 import { CaseStudiesSection } from "@/components/sections/CaseStudiesSection";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { FAQSection } from "@/components/sections/FAQSection";
@@ -13,10 +14,15 @@ import { ServicesSection } from "@/components/sections/ServicesSection";
 import { SocialProofSection } from "@/components/sections/SocialProofSection";
 import { SectionScrollSnap } from "@/components/ui/SectionScrollSnap";
 import { SnapSection } from "@/components/ui/SnapSection";
+import { buildHomePageGraph, buildSchemaGraph } from "@/lib/seo/schema";
 
 export default function HomePage() {
+  const homeSchema = buildSchemaGraph(buildHomePageGraph());
+
   return (
-    <SectionScrollSnap>
+    <>
+      <JsonLd data={homeSchema} />
+      <SectionScrollSnap>
       <Header />
       <main>
         <SnapSection>
@@ -55,5 +61,6 @@ export default function HomePage() {
       </SnapSection>
       <FloatingTelegramButton />
     </SectionScrollSnap>
+    </>
   );
 }

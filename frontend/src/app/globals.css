@@ -205,6 +205,187 @@ body {
   animation: speech-pop 0.2s ease-out forwards;
 }
 
+@keyframes hologram-materialize {
+  0% {
+    opacity: 0;
+    filter: blur(14px) brightness(2.8) saturate(0.2);
+    transform: perspective(900px) rotateX(10deg) translateY(24px);
+    clip-path: inset(0 0 100% 0);
+  }
+  18% {
+    opacity: 0.12;
+    filter: blur(8px) brightness(2.2) saturate(0.4);
+    clip-path: inset(0 0 72% 0);
+  }
+  36% {
+    opacity: 0.04;
+    filter: blur(5px) brightness(1.9);
+  }
+  52% {
+    opacity: 0.55;
+    filter: blur(2px) brightness(1.45) saturate(0.85);
+    clip-path: inset(0 0 18% 0);
+  }
+  68% {
+    opacity: 0.32;
+    filter: blur(1px) brightness(1.25);
+  }
+  84% {
+    opacity: 0.92;
+    filter: blur(0.4px) brightness(1.06);
+    clip-path: inset(0 0 0 0);
+  }
+  92% {
+    opacity: 0.78;
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0) brightness(1) saturate(1);
+    transform: perspective(900px) rotateX(0deg) translateY(0);
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes hologram-chroma-flash {
+  0%,
+  100% {
+    text-shadow: none;
+  }
+  20% {
+    text-shadow:
+      -2px 0 rgba(255, 60, 160, 0.55),
+      2px 0 rgba(0, 212, 255, 0.55);
+  }
+  40% {
+    text-shadow:
+      2px 0 rgba(255, 60, 160, 0.35),
+      -2px 0 rgba(0, 212, 255, 0.35);
+  }
+  60% {
+    text-shadow:
+      -1px 0 rgba(255, 60, 160, 0.2),
+      1px 0 rgba(0, 212, 255, 0.2);
+  }
+}
+
+@keyframes hologram-idle-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0.98;
+  }
+  50% {
+    opacity: 0.88;
+  }
+  52% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 0.96;
+  }
+}
+
+@keyframes hologram-beam-sweep {
+  0% {
+    top: -4px;
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    top: calc(100% + 4px);
+    opacity: 0;
+  }
+}
+
+@keyframes hologram-scanlines-settle {
+  0%,
+  35% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.28;
+  }
+}
+
+.hologram-panel {
+  position: relative;
+}
+
+.hologram-panel::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.9), transparent);
+  box-shadow:
+    0 0 18px rgba(0, 212, 255, 0.7),
+    0 0 36px rgba(0, 212, 255, 0.35);
+  animation: hologram-beam-sweep 2.4s ease-out forwards;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.hologram-panel::after {
+  content: "";
+  position: absolute;
+  inset: -10px -6px;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 3px,
+    rgba(0, 212, 255, 0.035) 3px,
+    rgba(0, 212, 255, 0.035) 4px
+  );
+  pointer-events: none;
+  z-index: 4;
+  opacity: 0;
+  animation: hologram-scanlines-settle 2.8s ease-out forwards;
+  mask-image: linear-gradient(to bottom, black 70%, transparent);
+}
+
+.hologram-reveal {
+  opacity: 0;
+  animation:
+    hologram-materialize 2s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    hologram-idle-flicker 5s ease-in-out 2.2s infinite;
+}
+
+.hologram-reveal-text {
+  animation:
+    hologram-materialize 2s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    hologram-chroma-flash 1.6s ease-out forwards,
+    hologram-idle-flicker 5s ease-in-out 2.2s infinite;
+}
+
+.hologram-glow {
+  text-shadow: 0 0 24px rgba(0, 212, 255, 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hologram-panel::before,
+  .hologram-panel::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .hologram-reveal,
+  .hologram-reveal-text {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
+    clip-path: none;
+  }
+}
+
 @layer components {
   .btn-primary {
     display: inline-flex;

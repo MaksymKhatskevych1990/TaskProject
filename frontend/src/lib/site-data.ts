@@ -6,6 +6,106 @@ export const SITE = {
   telegramUsername: "devcraft_studio",
   currency: "₴",
   locale: "uk-UA",
+  language: "uk",
+  foundingYear: 2020,
+  email: "hello@chameleon.digital",
+  phone: "+380441234567",
+  tagline: "IT-студія | Сайти, магазини, Telegram-боти",
+  description:
+    "Запустимо ваш бізнес онлайн за 14 днів. Сайти, інтернет-магазини, Telegram-боти та автоматизація під ключ.",
+  keywords: [
+    "веб-студія Україна",
+    "розробка сайтів",
+    "інтернет-магазин під ключ",
+    "Telegram-боти",
+    "UI/UX дизайн",
+    "SEO просування",
+    "digital агенція Київ",
+  ],
+  sameAs: ["https://t.me/devcraft_studio"] as const,
+} as const;
+
+/** GEO-локації для локального SEO (як на loungelizard.com — кілька офісів у @graph). */
+export const GEO_LOCATIONS = [
+  {
+    id: "kyiv",
+    name: "Київ",
+    label: "Kyiv — головний офіс",
+    streetAddress: "вул. Хрещатик, 22",
+    addressLocality: "Київ",
+    addressRegion: "м. Київ",
+    postalCode: "01001",
+    addressCountry: "UA",
+    geo: { latitude: 50.4501, longitude: 30.5234 },
+    telephone: "+380441234567",
+    isHeadquarters: true,
+  },
+  {
+    id: "lviv",
+    name: "Львів",
+    label: "Lviv",
+    streetAddress: "просп. Свободи, 7",
+    addressLocality: "Львів",
+    addressRegion: "Львівська область",
+    postalCode: "79000",
+    addressCountry: "UA",
+    geo: { latitude: 49.8397, longitude: 24.0297 },
+    telephone: "+380321234567",
+    isHeadquarters: false,
+  },
+  {
+    id: "odesa",
+    name: "Одеса",
+    label: "Odesa",
+    streetAddress: "вул. Дерибасівська, 16",
+    addressLocality: "Одеса",
+    addressRegion: "Одеська область",
+    postalCode: "65000",
+    addressCountry: "UA",
+    geo: { latitude: 46.4825, longitude: 30.7233 },
+    telephone: "+380481234567",
+    isHeadquarters: false,
+  },
+  {
+    id: "kharkiv",
+    name: "Харків",
+    label: "Kharkiv",
+    streetAddress: "просп. Науки, 27",
+    addressLocality: "Харків",
+    addressRegion: "Харківська область",
+    postalCode: "61000",
+    addressCountry: "UA",
+    geo: { latitude: 49.9935, longitude: 36.2304 },
+    telephone: "+380571234567",
+    isHeadquarters: false,
+  },
+] as const;
+
+export const SEO = {
+  defaultTitle: `${SITE.brand} — ${SITE.tagline}`,
+  titleTemplate: `%s — ${SITE.brand}`,
+  ogImagePath: "/og-image.png",
+  geoRegion: "UA-30",
+  geoPlacename: "Kyiv, Ukraine",
+  geoPosition: "50.4501;30.5234",
+  icbm: "50.4501, 30.5234",
+  areaServed: ["Україна", "Київ", "Львів", "Одеса", "Харків", "Європа"],
+  knowsAbout: [
+    "Web Design",
+    "Web Development",
+    "E-commerce",
+    "SEO",
+    "Telegram Bots",
+    "UI/UX Design",
+    "Schema.org markup",
+    "Local SEO",
+    "Answer Engine Optimization",
+  ],
+  openingHours: {
+    days: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+    opens: "09:00",
+    closes: "18:00",
+  },
 } as const;
 
 /** Ринкові ціни в гривнях. Тимчасові статичні значення — пізніше підвантаження з API. */
@@ -70,8 +170,7 @@ export const HERO = {
     userMessage: "Хочу сайт",
   },
   chameleon: {
-    ariaLabel: "Chameleon Digital Studio — наведи курсор, щоб хамелеон хвилювався",
-    dontDistract: "Не відволікай!",
+    ariaLabel: "Chameleon Digital Studio — наведи курсор, щоб хамелеон повернув голову",
   },
 } as const;
 
