@@ -16,6 +16,18 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "minio",
       },
+      {
+        protocol: "https",
+        hostname: "**.ngrok-free.app",
+      },
+      {
+        protocol: "https",
+        hostname: "**.ngrok.app",
+      },
+      {
+        protocol: "https",
+        hostname: "**.ngrok-free.dev",
+      },
     ],
   },
 };

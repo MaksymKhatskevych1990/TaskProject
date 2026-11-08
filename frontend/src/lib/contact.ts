@@ -7,9 +7,14 @@ export type ContactPayload = {
   plan?: string;
 };
 
-export function buildTelegramContactUrl(payload: ContactPayload): string {
+export function buildTelegramContactUrl(
+  payload: ContactPayload,
+  site?: { brand: string; telegramUsername: string },
+): string {
+  const brand = site?.brand ?? SITE.brand;
+  const telegramUsername = site?.telegramUsername ?? SITE.telegramUsername;
   const lines = [
-    `Нова заявка з сайту ${SITE.brand}`,
+    `Нова заявка з сайту ${brand}`,
     "",
     `Ім'я: ${payload.name}`,
     `Контакт: ${payload.phone}`,
@@ -19,7 +24,7 @@ export function buildTelegramContactUrl(payload: ContactPayload): string {
   ].filter(Boolean);
 
   const text = encodeURIComponent(lines.join("\n"));
-  return `https://t.me/${SITE.telegramUsername}?text=${text}`;
+  return `https://t.me/${telegramUsername}?text=${text}`;
 }
 
 export async function submitContact(payload: ContactPayload): Promise<void> {

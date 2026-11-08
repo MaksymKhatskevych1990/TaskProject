@@ -1,0 +1,9 @@
+# Chameleon Digital Studio
+
+- URL: https://chameleon.digital
+- Language: uk
+- Offers: custom websites, e-commerce, SEO, Google Ads, Telegram bots, custom CRM, mobile apps
+- Contact: Telegram @devcraft_studio, hello@chameleon.digital
+- Location: Dnipro, Ukraine, remote-first
+- Portfolio: /works
+- Services: /poslugy /poslugy/sajty /poslugy/lendingy /poslugy/korporatyvni-sajty /poslugy/internet-magazyn /poslugy/seo /poslugy/kontekstna-reklama /poslugy/telegram-boty /poslugy/crm-erp /poslugy/mobilni-zastosunky /poslugy/dyzajn

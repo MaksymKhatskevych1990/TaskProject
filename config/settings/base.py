@@ -222,12 +222,20 @@ JAZZMIN_SETTINGS = {
         "telegram",
         "django_celery_beat",
         "token_blacklist",
+        "website.siteseosettings",
+        "website.contactlead",
+        "website.blogpost",
+        "website.blogcategory",
+        "website.portfolioproject",
         "website",
     ],
     "icons": {
         "website.blogcategory": "fas fa-tags",
         "website.blogpost": "fas fa-newspaper",
         "website.contactlead": "fas fa-envelope",
+        "projects.project": "fas fa-briefcase",
+        "website.siteseosettings": "fas fa-sliders-h",
+        "website.portfolioproject": "fas fa-images",
     },
 }
 

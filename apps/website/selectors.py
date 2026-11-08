@@ -5,7 +5,7 @@ from __future__ import annotations
 from django.db.models import QuerySet
 
 from apps.website.choices import BlogPostStatus
-from apps.website.models import BlogPost, PortfolioProject
+from apps.website.models import BlogPost, PortfolioProject, SiteSeoSettings
 
 
 def list_published_blog_posts() -> QuerySet[BlogPost]:
@@ -51,3 +51,9 @@ def get_published_portfolio_project(*, slug: str) -> PortfolioProject | None:
         .prefetch_related("gallery_images")
         .first()
     )
+
+
+def get_site_seo_settings() -> SiteSeoSettings:
+    """Return the singleton public SEO settings row, creating defaults if needed."""
+    settings, _created = SiteSeoSettings.objects.get_or_create(pk=1)
+    return settings

@@ -1,12 +1,16 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { FormEvent, useEffect, useState } from "react";
 import { buildTelegramContactUrl, submitContact } from "@/lib/contact";
-import { CONTACT, HERO_BRIEF, PRICING_PLANS, SITE } from "@/lib/site-data";
+import { useSiteContent } from "@/components/site-content/SiteContentProvider";
+import { NEXT_STEPS } from "@/lib/marketing-pages";
+import { formatUaPhone, isPlaceholderPhone, toTelHref } from "@/lib/phone";
 import order from "@/image/order.png";
 
 export function ContactSection() {
+  const content = useSiteContent();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,15 +23,15 @@ export function ContactSection() {
     const needParam = params.get("need");
 
     if (planParam) {
-      const matchedPlan = PRICING_PLANS.find((item) => item.slug === planParam);
+      const matchedPlan = content.pricing.find((item) => item.slug === planParam);
       setPlan(matchedPlan?.name ?? planParam);
     }
 
     if (needParam) {
-      const matchedNeed = HERO_BRIEF.find((item) => item.id === needParam);
+      const matchedNeed = content.hero.offers.find((item) => item.id === needParam);
       setNeed(matchedNeed?.label ?? needParam);
     }
-  }, []);
+  }, [content.hero.offers, content.pricing]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -42,7 +46,10 @@ export function ContactSection() {
       plan: [need, plan].filter(Boolean).join(" · ") || undefined,
     };
 
-    const telegramUrl = buildTelegramContactUrl(payload);
+    const telegramUrl = buildTelegramContactUrl(payload, {
+      brand: content.brand,
+      telegramUsername: content.telegramUsername,
+    });
 
     try {
       await submitContact(payload);
@@ -51,7 +58,7 @@ export function ContactSection() {
         window.open(telegramUrl, "_blank");
       }, 1200);
     } catch {
-      setError(CONTACT.errorMessage);
+      setError(content.contact.errorMessage);
       window.open(telegramUrl, "_blank");
     } finally {
       setLoading(false);
@@ -65,28 +72,46 @@ export function ContactSection() {
           <div className="lg:pb-8">
             <p className="section-number mb-4">08</p>
             <h2 className="editorial-heading text-3xl sm:text-4xl lg:text-[2.75rem]">
-              {CONTACT.title}
+              {content.contact.title}
             </h2>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted">
-              {CONTACT.subtitle}
+              {content.contact.subtitle}
             </p>
 
             <div className="mt-10 space-y-3 text-sm">
+              {!isPlaceholderPhone(content.phone) ? (
+                <a
+                  href={toTelHref(content.phone)}
+                  className="block text-foreground transition-colors hover:text-accent-bright"
+                >
+                  {formatUaPhone(content.phone)}
+                </a>
+              ) : null}
               <a
-                href={SITE.telegramUrl}
+                href={content.telegramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block text-foreground transition-colors hover:text-accent-bright"
               >
-                Telegram — @{SITE.telegramUsername}
+                Telegram — @{content.telegramUsername}
               </a>
               <a
-                href={`mailto:${SITE.email}`}
+                href={`mailto:${content.email}`}
                 className="block text-muted transition-colors hover:text-foreground"
               >
-                {SITE.email}
+                {content.email}
               </a>
             </div>
+            <ol className="mt-10 max-w-sm space-y-3 text-sm text-muted">
+              {NEXT_STEPS.map((step, index) => (
+                <li key={step} className="grid grid-cols-[1.5rem_1fr] gap-2">
+                  <span className="font-[family-name:var(--font-jetbrains)] text-xs text-accent">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  {step}
+                </li>
+              ))}
+            </ol>
           </div>
 
           <div className="relative mx-auto w-full max-w-[420px] lg:max-w-none lg:-mb-8">
@@ -101,10 +126,10 @@ export function ContactSection() {
           <div className="lg:pb-8">
             {submitted ? (
               <div className="border-l-2 border-accent py-4 pl-6">
-                <h3 className="text-xl font-semibold">{CONTACT.successTitle}</h3>
-                <p className="mt-2 text-sm text-muted">{CONTACT.successSubtitle}</p>
+                <h3 className="text-xl font-semibold">{content.contact.successTitle}</h3>
+                <p className="mt-2 text-sm text-muted">{content.contact.successSubtitle}</p>
                 <a
-                  href={SITE.telegramUrl}
+                  href={content.telegramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-ghost mt-6"
@@ -125,7 +150,7 @@ export function ContactSection() {
 
                 <div>
                   <label htmlFor="name" className="label-mono mb-2 block">
-                    {CONTACT.fields.name.label}
+                    {content.contact.fields.name.label}
                   </label>
                   <input
                     id="name"
@@ -133,13 +158,13 @@ export function ContactSection() {
                     required
                     autoComplete="name"
                     className="input-field"
-                    placeholder={CONTACT.fields.name.placeholder}
+                    placeholder={content.contact.fields.name.placeholder}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="phone" className="label-mono mb-2 block">
-                    {CONTACT.fields.phone.label}
+                    {content.contact.fields.phone.label}
                   </label>
                   <input
                     id="phone"
@@ -147,13 +172,13 @@ export function ContactSection() {
                     required
                     autoComplete="tel"
                     className="input-field"
-                    placeholder={CONTACT.fields.phone.placeholder}
+                    placeholder={content.contact.fields.phone.placeholder}
                   />
                 </div>
 
                 <div>
                   <label htmlFor="project" className="label-mono mb-2 block">
-                    {CONTACT.fields.project.label}
+                    {content.contact.fields.project.label}
                   </label>
                   <textarea
                     id="project"
@@ -161,7 +186,7 @@ export function ContactSection() {
                     required
                     rows={3}
                     className="input-field resize-none"
-                    placeholder={CONTACT.fields.project.placeholder}
+                    placeholder={content.contact.fields.project.placeholder}
                   />
                 </div>
 
@@ -174,8 +199,19 @@ export function ContactSection() {
                   disabled={loading}
                   className="btn-primary w-full py-3.5 disabled:opacity-60 sm:w-auto"
                 >
-                  {loading ? CONTACT.submitting : CONTACT.submit}
+                  {loading ? content.contact.submitting : content.contact.submit}
                 </button>
+                <p className="text-xs leading-relaxed text-muted">
+                  Натискаючи кнопку, ви погоджуєтесь з{" "}
+                  <Link href="/privacy" className="underline hover:text-foreground">
+                    політикою конфіденційності
+                  </Link>{" "}
+                  і{" "}
+                  <Link href="/oferta" className="underline hover:text-foreground">
+                    офертою
+                  </Link>
+                  . Без розсилок.
+                </p>
               </form>
             )}
           </div>

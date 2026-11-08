@@ -9,7 +9,7 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { formatBlogDate, getBlogPost } from "@/lib/blog-api";
 import { createPageMetadata } from "@/lib/seo/metadata";
 import { buildBlogPostGraph, buildSchemaGraph } from "@/lib/seo/schema";
-import { BLOG_PAGE } from "@/lib/site-data";
+import { getSiteContent } from "@/lib/site-content";
 import { cn } from "@/lib/utils";
 
 const categoryColors: Record<string, string> = {
@@ -30,12 +30,20 @@ export async function generateMetadata({
   const post = await getBlogPost(slug);
   if (!post) return { title: "Стаття не знайдена" };
 
+  const seo = post.seo;
   return createPageMetadata({
-    title: post.title,
-    description: post.excerpt,
+    title: seo?.title || post.title,
+    description: seo?.description || post.excerpt,
     path: `/blog/${post.slug}`,
     type: "article",
     publishedTime: post.date,
+    modifiedTime: post.updatedAt,
+    noIndex: seo?.noindex ?? post.noindex,
+    ogImage: seo?.ogImage,
+    ogTitle: seo?.ogTitle,
+    ogDescription: seo?.ogDescription,
+    canonical: seo?.canonicalUrl || undefined,
+    absoluteTitle: Boolean(seo?.title && seo.title !== post.title),
   });
 }
 
@@ -45,10 +53,10 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = await getBlogPost(slug);
+  const [post, content] = await Promise.all([getBlogPost(slug), getSiteContent()]);
   if (!post) notFound();
 
-  const articleSchema = buildSchemaGraph(buildBlogPostGraph(post));
+  const articleSchema = buildSchemaGraph(buildBlogPostGraph(post, content));
 
   return (
     <>
@@ -60,7 +68,7 @@ export default async function BlogPostPage({
             href="/blog"
             className="label-mono inline-flex transition-colors hover:text-foreground"
           >
-            {BLOG_PAGE.backToBlog}
+            {content.blogPage.backToBlog}
           </Link>
 
           <header className="mt-8">
@@ -74,12 +82,12 @@ export default async function BlogPostPage({
                 {post.category}
               </span>
               <span className="font-[family-name:var(--font-jetbrains)] text-xs text-muted">
-                {formatBlogDate(post.date)} · {post.readTime} {BLOG_PAGE.readTime}
+                {formatBlogDate(post.date)} · {post.readTime} {content.blogPage.readTime}
               </span>
             </div>
 
             <h1 className="mt-6 editorial-heading text-3xl sm:text-4xl">
-              {post.title}
+              {post.seo?.h1 || post.title}
             </h1>
             <p className="mt-4 text-lg leading-relaxed text-muted">{post.excerpt}</p>
           </header>
@@ -90,13 +98,13 @@ export default async function BlogPostPage({
 
           <div className="mt-16 border-l-2 border-accent-warm py-2 pl-6">
             <p className="font-[family-name:var(--font-exo2)] text-lg font-semibold">
-              Потрібна допомога з проєктом?
+              {content.blogPage.ctaTitle}
             </p>
             <p className="mt-2 text-sm text-muted">
-              Розкажіть про задачу — відповімо в Telegram протягом 30 хвилин.
+              {content.blogPage.ctaSubtitle}
             </p>
             <Link href="/#contact" className="btn-primary mt-4 inline-flex">
-              Розпочати проєкт
+              {content.blogPage.ctaButton}
             </Link>
           </div>
         </article>

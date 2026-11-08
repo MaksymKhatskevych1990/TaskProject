@@ -2,60 +2,117 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { SECTIONS } from "@/lib/site-data";
+import { useEffect, useMemo, useState } from "react";
+import { BrowserMockup } from "@/components/portfolio/BrowserMockup";
+import { publicCoverUrl, staticGallery } from "@/lib/portfolio-covers";
+import { useSiteContent } from "@/components/site-content/SiteContentProvider";
 import type { PortfolioProjectDetail, PortfolioProjectListItem } from "@/lib/portfolio-api";
-import { cn } from "@/lib/utils";
 
-function PortfolioPreview({
-  title,
-  gradient,
-  coverImage,
+function pad(n: number) {
+  return String(n).padStart(2, "0");
+}
+
+function sortProjects(projects: PortfolioProjectListItem[]) {
+  return [...projects].sort((a, b) => {
+    if (a.featured !== b.featured) return a.featured ? -1 : 1;
+    return 0;
+  });
+}
+
+function isPublicClientUrl(url: string): boolean {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    return !["localhost", "127.0.0.1"].includes(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function ProjectTile({
+  project,
+  index,
 }: {
-  title: string;
-  gradient: string;
-  coverImage: string | null;
+  project: PortfolioProjectListItem;
+  index: number;
 }) {
   return (
-    <div className="overflow-hidden border border-[var(--card-border)] bg-[var(--card-elevated)]">
-      <div className="flex items-center gap-2 border-b border-[var(--card-border)] px-3 py-2">
-        <span className="font-[family-name:var(--font-jetbrains)] text-[9px] tracking-wide text-muted">
-          {title.toLowerCase().replace(/\s+/g, "")}.ua
-        </span>
+    <Link
+      href={`/works/${project.slug}`}
+      className="proj-card group flex cursor-pointer flex-col overflow-hidden border border-[var(--card-border)] bg-[var(--card)] transition-[border-color,transform] duration-400 hover:-translate-y-0.5 hover:border-accent/35"
+    >
+      <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden">
+        <BrowserMockup project={project} />
       </div>
-      <div className={cn("relative aspect-[16/10] bg-gradient-to-br", gradient)}>
-        {coverImage ? (
-          <Image
-            src={coverImage}
-            alt={title}
-            fill
-            className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.02]"
-            sizes="(max-width: 768px) 85vw, 420px"
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center p-6">
-            <div className="w-full space-y-2">
-              <div className="h-2 w-2/3 bg-[var(--card-border)]" />
-              <div className="h-1.5 w-full bg-[var(--card-border)]" />
-              <div className="h-1.5 w-4/5 bg-[var(--card-border)]" />
-            </div>
+
+      <div className="flex flex-col gap-2 border-t border-[var(--card-border)] px-4 py-3.5 sm:px-5 sm:py-4">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-x-2.5 gap-y-1">
+            <span className="label-mono text-accent-bright">{pad(index + 1)}</span>
+            <span className="label-mono truncate text-muted">{project.category}</span>
           </div>
-        )}
+          {project.hasCaseStudy ? (
+            <span className="shrink-0 font-[family-name:var(--font-exo2)] text-lg font-bold tracking-tight accent-warm-text sm:text-xl">
+              {project.metric}
+            </span>
+          ) : null}
+        </div>
+
+        <div className="flex items-end justify-between gap-3">
+          <div className="min-w-0">
+            <h3 className="editorial-heading text-lg leading-snug text-foreground transition-colors group-hover:text-accent-bright sm:text-xl">
+              {project.title}
+            </h3>
+            <p className="mt-1 line-clamp-1 text-sm text-muted">
+              {project.description}
+            </p>
+          </div>
+          <span
+            aria-hidden="true"
+            className="mb-0.5 shrink-0 font-[family-name:var(--font-jetbrains)] text-sm text-muted transition-all duration-300 group-hover:translate-x-0.5 group-hover:text-accent-bright"
+          >
+            →
+          </span>
+        </div>
       </div>
-    </div>
+    </Link>
   );
 }
 
-function PortfolioCaseModal({
+export function PortfolioCaseModal({
   project,
   onClose,
 }: {
   project: PortfolioProjectDetail;
   onClose: () => void;
 }) {
+  const content = useSiteContent();
+  const [lightbox, setLightbox] = useState<string | null>(null);
+
+  const photos = useMemo(() => {
+    const fallback = staticGallery(project.slug);
+    if (fallback.length > 0) return fallback;
+
+    const fromGallery = project.gallery
+      .map((item) => ({
+        url: publicCoverUrl(item.imageUrl),
+        caption: item.caption || project.title,
+      }))
+      .filter((item): item is { url: string; caption: string } => Boolean(item.url));
+
+    if (fromGallery.length > 0) return fromGallery;
+
+    const cover = publicCoverUrl(project.coverImage, project.slug);
+    if (cover) return [{ url: cover, caption: project.title }];
+    return [] as { url: string; caption: string }[];
+  }, [project]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        if (lightbox) setLightbox(null);
+        else onClose();
+      }
     };
 
     document.addEventListener("keydown", handleKeyDown);
@@ -65,312 +122,191 @@ function PortfolioCaseModal({
       document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = "";
     };
-  }, [onClose]);
+  }, [onClose, lightbox]);
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
+      className="project-modal-overlay"
       role="presentation"
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-background/90 backdrop-blur-sm" />
-
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="portfolio-case-title"
-        className="relative z-10 flex max-h-[92vh] w-full max-w-3xl flex-col overflow-hidden border border-[var(--card-border)] bg-[var(--card)] sm:max-h-[85vh]"
+        className="project-modal-panel"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-[var(--card-border)] px-6 py-5">
-          <div>
-            <p className="label-mono">{project.category}</p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="project-modal-close"
+          aria-label="Закрити"
+        >
+          ×
+        </button>
+
+        <div className="project-modal-body mx-auto max-w-4xl px-5 sm:px-8">
+          <header className="mb-8">
+            <p className="label-mono text-accent-bright">
+              кейс · {project.category}
+            </p>
             <h3
               id="portfolio-case-title"
-              className="mt-1 editorial-heading text-xl sm:text-2xl"
+              className="editorial-heading mt-3 text-3xl sm:text-4xl"
             >
               {project.title}
             </h3>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-2 text-muted transition-colors hover:text-foreground"
-            aria-label="Закрити"
-          >
-            ✕
-          </button>
-        </div>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted sm:text-base">
+              {project.caseDescription || project.description}
+            </p>
+          </header>
 
-        <div className="overflow-y-auto px-6 py-6">
-          <PortfolioPreview
-            title={project.title}
-            gradient={project.gradient}
-            coverImage={project.coverImage}
-          />
-
-          {project.hasCaseStudy ? (
-            <div className="mt-8 grid grid-cols-3 items-center gap-4 border-t border-[var(--card-border)] pt-8">
-              <div>
-                <p className="label-mono mb-1">{SECTIONS.cases.before}</p>
-                <p className="text-sm text-muted">{project.before}</p>
-              </div>
-              <p className="text-center font-[family-name:var(--font-exo2)] text-2xl font-bold accent-warm-text">
-                {project.metric}
-              </p>
-              <div className="text-right">
-                <p className="label-mono mb-1">{SECTIONS.cases.after}</p>
-                <p className="text-sm font-medium accent-text">{project.after}</p>
-              </div>
-            </div>
-          ) : null}
-
-          <p className="mt-6 text-sm leading-relaxed text-muted">
-            {project.caseDescription || project.description}
-          </p>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            {project.tags.map((tag) => (
-              <span
-                key={tag}
-                className="border border-[var(--card-border)] px-2.5 py-0.5 text-[11px] text-muted"
-              >
-                {tag}
-              </span>
-            ))}
+          <div className="relative mb-8 aspect-[16/10] overflow-hidden border border-[var(--card-border)]">
+            <BrowserMockup project={project} />
           </div>
 
-          {project.gallery.length > 0 ? (
-            <div className="mt-8 grid gap-3 sm:grid-cols-2">
-              {project.gallery.map((item) =>
-                item.imageUrl ? (
-                  <figure
-                    key={`${item.ordering}-${item.imageUrl}`}
-                    className="overflow-hidden border border-[var(--card-border)]"
-                  >
-                    <div className="relative aspect-[16/10]">
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.caption || project.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 384px"
-                      />
-                    </div>
-                    {item.caption ? (
-                      <figcaption className="px-3 py-2 text-xs text-muted">
-                        {item.caption}
-                      </figcaption>
-                    ) : null}
-                  </figure>
-                ) : null,
-              )}
-            </div>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-3 border-t border-[var(--card-border)] px-6 py-5 sm:flex-row">
-          {project.clientUrl ? (
-            <a
-              href={project.clientUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-secondary flex-1 py-2.5 text-center"
-            >
-              Відкрити сайт
-            </a>
-          ) : null}
-          <Link
-            href="/#contact"
-            onClick={onClose}
-            className="btn-primary flex-1 py-2.5 text-center"
-          >
-            {SECTIONS.portfolio.viewAll}
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function PortfolioScroll({
-  projects,
-  onOpen,
-}: {
-  projects: PortfolioProjectListItem[];
-  onOpen: (slug: string) => void;
-}) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
-
-  const updateScrollState = useCallback(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    setCanScrollLeft(el.scrollLeft > 4);
-    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 4);
-  }, []);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-
-    updateScrollState();
-
-    const onScroll = () => updateScrollState();
-    const onResize = () => updateScrollState();
-
-    const onWheel = (event: WheelEvent) => {
-      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
-      event.preventDefault();
-      el.scrollLeft += event.deltaY;
-    };
-
-    el.addEventListener("scroll", onScroll, { passive: true });
-    el.addEventListener("wheel", onWheel, { passive: false });
-    window.addEventListener("resize", onResize);
-
-    return () => {
-      el.removeEventListener("scroll", onScroll);
-      el.removeEventListener("wheel", onWheel);
-      window.removeEventListener("resize", onResize);
-    };
-  }, [projects.length, updateScrollState]);
-
-  const scrollBy = (direction: "left" | "right") => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const amount = Math.min(el.clientWidth * 0.85, 480);
-    el.scrollBy({ left: direction === "left" ? -amount : amount, behavior: "smooth" });
-  };
-
-  return (
-    <div className="relative">
-      {/* Fade edges */}
-      <div
-        className={cn(
-          "pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-background to-transparent transition-opacity duration-300 sm:w-24",
-          canScrollLeft ? "opacity-100" : "opacity-0",
-        )}
-      />
-      <div
-        className={cn(
-          "pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-background to-transparent transition-opacity duration-300 sm:w-24",
-          canScrollRight ? "opacity-100" : "opacity-0",
-        )}
-      />
-
-      {/* Nav buttons */}
-      <button
-        type="button"
-        onClick={() => scrollBy("left")}
-        aria-label="Попередній проєкт"
-        className={cn(
-          "absolute left-2 top-[38%] z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-[var(--card-border)] bg-background/90 text-foreground backdrop-blur-sm transition-all hover:border-accent hover:text-accent-bright sm:left-6",
-          canScrollLeft ? "opacity-100" : "pointer-events-none opacity-0",
-        )}
-      >
-        ←
-      </button>
-      <button
-        type="button"
-        onClick={() => scrollBy("right")}
-        aria-label="Наступний проєкт"
-        className={cn(
-          "absolute right-2 top-[38%] z-20 flex h-10 w-10 -translate-y-1/2 items-center justify-center border border-[var(--card-border)] bg-background/90 text-foreground backdrop-blur-sm transition-all hover:border-accent hover:text-accent-bright sm:right-6",
-          canScrollRight ? "opacity-100" : "pointer-events-none opacity-0",
-        )}
-      >
-        →
-      </button>
-
-      <div
-        ref={scrollRef}
-        className="horizontal-scroll px-5 sm:px-8 lg:px-12"
-        role="region"
-        aria-label="Портфоліо проєктів"
-        tabIndex={0}
-      >
-        {projects.map((project) => (
-          <button
-            key={project.slug}
-            type="button"
-            onClick={() => onOpen(project.slug)}
-            className="group w-[min(85vw,420px)] cursor-pointer text-left"
-          >
-            <PortfolioPreview
-              title={project.title}
-              gradient={project.gradient}
-              coverImage={project.coverImage}
-            />
-            <div className="mt-4 pr-4">
-              <span className="label-mono text-accent-bright">{project.category}</span>
-              <h3 className="mt-1 text-lg font-semibold text-foreground">{project.title}</h3>
-              <p className="mt-2 line-clamp-2 text-sm text-muted">
-                {project.description}
-              </p>
+          <div className="grid gap-10 border-t border-[var(--card-border)] pt-10 lg:grid-cols-[minmax(0,1.4fr)_minmax(240px,0.7fr)] lg:gap-14">
+            <div>
               {project.hasCaseStudy ? (
-                <p className="mt-3 text-sm font-medium accent-warm-text">
-                  {project.metric}
-                </p>
+                <div className="mb-8 grid grid-cols-3 items-center gap-4">
+                  <div>
+                    <p className="label-mono mb-1">{content.sections.cases.before}</p>
+                    <p className="text-sm text-muted">{project.before}</p>
+                  </div>
+                  <p className="text-center font-[family-name:var(--font-exo2)] text-3xl font-bold accent-warm-text">
+                    {project.metric}
+                  </p>
+                  <div className="text-right">
+                    <p className="label-mono mb-1">{content.sections.cases.after}</p>
+                    <p className="text-sm font-medium accent-text">{project.after}</p>
+                  </div>
+                </div>
+              ) : null}
+
+              <div className="flex flex-wrap gap-2">
+                {project.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="border border-[var(--card-border)] px-2.5 py-0.5 text-[11px] text-muted"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+
+              {photos.length > 0 ? (
+                <div className="mt-10">
+                  <p className="label-mono mb-4">Екрани сайту</p>
+                  <div className="grid gap-4">
+                    {photos.map((photo) => (
+                      <button
+                        key={`${photo.url}-${photo.caption}`}
+                        type="button"
+                        className="relative aspect-[16/10] overflow-hidden border border-[var(--card-border)] bg-[#0a0b0c] text-left"
+                        onClick={() => setLightbox(photo.url)}
+                        aria-label={photo.caption || "Відкрити фото"}
+                      >
+                        <Image
+                          src={photo.url}
+                          alt={photo.caption}
+                          fill
+                          className="object-cover object-top"
+                          sizes="(max-width: 900px) 100vw, 640px"
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ) : null}
             </div>
-          </button>
-        ))}
+
+            <aside className="border border-[var(--card-border)] bg-[var(--card)] p-6 lg:sticky lg:top-6 lg:self-start">
+              <p className="label-mono text-accent-bright">{project.category}</p>
+              <p className="editorial-heading mt-3 text-xl">{project.title}</p>
+              <div className="mt-8 flex flex-col gap-3">
+                {isPublicClientUrl(project.clientUrl) ? (
+                  <a
+                    href={project.clientUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary py-2.5 text-center"
+                  >
+                    Відкрити сайт
+                  </a>
+                ) : null}
+                <Link
+                  href="/#contact"
+                  onClick={onClose}
+                  className="btn-primary py-2.5 text-center"
+                >
+                  {content.sections.portfolio.viewAll}
+                </Link>
+              </div>
+            </aside>
+          </div>
+        </div>
       </div>
 
-      <p className="mt-2 px-5 text-center font-[family-name:var(--font-jetbrains)] text-[10px] tracking-widest text-muted sm:px-8 lg:px-12">
-        ← прокрутіть або використайте колесо миші →
-      </p>
+      {lightbox ? (
+        <div
+          role="presentation"
+          className="project-modal-lightbox"
+          onClick={() => setLightbox(null)}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={lightbox} alt="" className="project-modal-lightbox-img" />
+        </div>
+      ) : null}
     </div>
   );
 }
 
 type PortfolioSectionClientProps = {
   projects: PortfolioProjectListItem[];
-  detailsBySlug: Record<string, PortfolioProjectDetail>;
 };
 
 export function PortfolioSectionClient({
   projects,
-  detailsBySlug,
 }: PortfolioSectionClientProps) {
-  const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
-
-  const openProject = useCallback((slug: string) => {
-    if (detailsBySlug[slug]) setSelectedSlug(slug);
-  }, [detailsBySlug]);
-
-  const closeProject = useCallback(() => setSelectedSlug(null), []);
-  const selectedProject = selectedSlug ? detailsBySlug[selectedSlug] : null;
+  const content = useSiteContent();
+  const ordered = useMemo(() => sortProjects(projects).slice(0, 4), [projects]);
 
   return (
     <>
-      <section id="portfolio" className="overflow-hidden py-24 sm:py-32">
+      <section id="portfolio" className="overflow-hidden py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
-          <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="section-number mb-4">02</p>
+          <div className="mb-6 flex items-end justify-between gap-6 border-b border-[var(--card-border)] pb-4 sm:mb-7">
+            <div className="max-w-xl">
+              <p className="section-number mb-3">02</p>
               <h2 className="editorial-heading text-3xl sm:text-4xl">
-                {SECTIONS.portfolio.title}
+                {content.sections.portfolio.title}
               </h2>
-              <p className="mt-3 max-w-md text-sm text-muted">
-                {SECTIONS.portfolio.subtitle}
+              <p className="mt-3 text-sm leading-relaxed text-muted">
+                {content.sections.portfolio.subtitle}
               </p>
             </div>
-            <Link href="/#contact" className="btn-secondary shrink-0 self-start sm:self-auto">
-              {SECTIONS.portfolio.viewAll}
+            <Link
+              href="/works"
+              className="hidden shrink-0 border-b border-muted/40 pb-1 font-[family-name:var(--font-jetbrains)] text-xs tracking-[0.12em] text-muted transition-colors hover:border-accent hover:text-accent-bright sm:inline-flex"
+            >
+              Усі роботи
+            </Link>
+          </div>
+
+          <div className="proj-home-grid">
+            {ordered.map((project, index) => (
+              <ProjectTile key={project.slug} project={project} index={index} />
+            ))}
+          </div>
+
+          <div className="mt-6 sm:hidden">
+            <Link href="/works" className="btn-secondary w-full text-center">
+              Усі роботи
             </Link>
           </div>
         </div>
-
-        <PortfolioScroll projects={projects} onOpen={openProject} />
       </section>
-
-      {selectedProject ? (
-        <PortfolioCaseModal project={selectedProject} onClose={closeProject} />
-      ) : null}
     </>
   );
 }

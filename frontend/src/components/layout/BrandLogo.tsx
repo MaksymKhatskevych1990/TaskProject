@@ -14,6 +14,7 @@ type BrandLogoProps = {
   showText?: boolean;
   emblemSize?: keyof typeof emblemSizes;
   emblemVariant?: "default" | "header";
+  brandShort?: string;
   className?: string;
 };
 
@@ -21,6 +22,7 @@ export function BrandLogo({
   showText = true,
   emblemSize = "md",
   emblemVariant = "default",
+  brandShort = SITE.brandShort,
   className,
 }: BrandLogoProps) {
   const isHeaderEmblem = emblemVariant === "header";
@@ -51,7 +53,7 @@ export function BrandLogo({
       {showText ? (
         <span className="leading-none">
           <span className="block font-[family-name:var(--font-exo2)] text-[15px] font-bold tracking-tight text-foreground">
-            {SITE.brandShort}
+            {brandShort}
           </span>
           <span className="mt-0.5 block font-[family-name:var(--font-jetbrains)] text-[8px] uppercase tracking-[0.2em] text-muted">
             studio

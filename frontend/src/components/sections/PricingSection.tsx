@@ -1,40 +1,42 @@
-import { formatPrice, PRICING_PLANS, SECTIONS } from "@/lib/site-data";
+import { formatSitePrice, getSiteContent } from "@/lib/site-content";
 import { cn } from "@/lib/utils";
 
-export function PricingSection() {
+export async function PricingSection() {
+  const content = await getSiteContent();
+
   return (
     <section id="pricing" className="border-t border-[var(--card-border)] py-24 sm:py-32">
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
         <div className="mb-16 max-w-lg">
           <p className="section-number mb-4">05</p>
           <h2 className="editorial-heading text-3xl sm:text-4xl">
-            {SECTIONS.pricing.title}
+            {content.sections.pricing.title}
           </h2>
-          <p className="mt-4 text-sm text-muted">{SECTIONS.pricing.subtitle}</p>
+          <p className="mt-4 text-sm text-muted">{content.sections.pricing.subtitle}</p>
         </div>
 
         <div className="grid gap-px bg-[var(--card-border)] lg:grid-cols-3">
-          {PRICING_PLANS.map((plan) => (
+          {content.pricing.map((plan) => (
             <article
-              key={plan.name}
+              key={plan.slug}
               className={cn(
                 "flex flex-col bg-background p-8 sm:p-10",
                 plan.highlighted && "lg:-mt-4 lg:-mb-4 lg:bg-[var(--card)] lg:py-12",
               )}
             >
-              {"badge" in plan && plan.badge && (
+              {plan.badge ? (
                 <span className="label-mono mb-6 text-accent-warm-bright">
                   {plan.badge}
                 </span>
-              )}
+              ) : null}
 
               <h3 className="editorial-heading text-2xl">{plan.name}</h3>
               <p className="mt-2 text-sm text-muted">{plan.description}</p>
 
               <div className="mt-8">
-                <span className="text-xs text-muted">{SECTIONS.pricing.from} </span>
+                <span className="text-xs text-muted">{content.sections.pricing.from} </span>
                 <p className="font-[family-name:var(--font-exo2)] text-3xl font-bold tracking-tight">
-                  {formatPrice(plan.price)}
+                  {formatSitePrice(plan.price, content)}
                 </p>
               </div>
 
@@ -59,11 +61,15 @@ export function PricingSection() {
                     : "btn-secondary w-full",
                 )}
               >
-                {SECTIONS.pricing.choosePlan}
+                {content.sections.pricing.choosePlan}
               </a>
             </article>
           ))}
         </div>
+        <p className="mt-8 max-w-2xl text-sm leading-relaxed text-muted">
+          50% на старті, 50% після здачі. У ціну входять дизайн, розробка, базове SEO і підтримка.
+          Хостинг, домен і комісії оплати — окремо, без сюрпризів у рахунку.
+        </p>
       </div>
     </section>
   );

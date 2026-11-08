@@ -1,7 +1,7 @@
 """Tests for website text helpers."""
 
+from apps.website.models import BlogCategory, BlogPost
 from apps.website.text import ensure_unique_slug, is_latin_slug, latin_slugify
-from apps.website.models import BlogPost, BlogCategory
 from tests.base import BaseTestCase
 
 
@@ -12,7 +12,7 @@ class WebsiteTextTests(BaseTestCase):
         """Ukrainian titles become readable Latin slugs."""
         self.assertEqual(
             latin_slugify("Як підготувати сайт до SEO"),
-            "yak-pidgotuvaty-sayt-do-seo",
+            "yak-pidhotuvaty-sayt-do-seo",
         )
 
     def test_latin_slugify_transliterates_russian_title(self) -> None:
@@ -29,7 +29,10 @@ class WebsiteTextTests(BaseTestCase):
 
     def test_ensure_unique_slug_adds_suffix(self) -> None:
         """Duplicate slugs receive numeric suffixes."""
-        category = BlogCategory.objects.create(name="SEO", slug="seo")
+        category, _ = BlogCategory.objects.get_or_create(
+            slug="seo",
+            defaults={"name": "SEO"},
+        )
         BlogPost.objects.create(
             title="First",
             slug="seo-checklist",

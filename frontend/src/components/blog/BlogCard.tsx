@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BLOG_PAGE } from "@/lib/site-data";
+import { getSiteContent } from "@/lib/site-content";
 import { formatBlogDate, type BlogPostListItem } from "@/lib/blog-api";
 import { cn } from "@/lib/utils";
 
@@ -10,13 +10,14 @@ const categoryColors: Record<string, string> = {
   "E-commerce": "border-accent-warm/30 text-accent-warm-bright",
 };
 
-export function BlogCard({
+export async function BlogCard({
   post,
   featured = false,
 }: {
   post: BlogPostListItem;
   featured?: boolean;
 }) {
+  const content = await getSiteContent();
   return (
     <Link
       href={`/blog/${post.slug}`}
@@ -54,10 +55,10 @@ export function BlogCard({
 
       <div className="mt-5 flex items-center justify-between pt-4">
         <span className="font-[family-name:var(--font-jetbrains)] text-xs text-muted">
-          {post.readTime} {BLOG_PAGE.readTime}
+          {post.readTime} {content.blogPage.readTime}
         </span>
         <span className="text-sm font-medium text-muted transition-colors group-hover:text-accent-bright">
-          {BLOG_PAGE.readMore} →
+          {content.blogPage.readMore} →
         </span>
       </div>
     </Link>

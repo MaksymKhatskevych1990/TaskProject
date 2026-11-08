@@ -1,4 +1,5 @@
 import { getBackendApiUrl } from "@/lib/api-config";
+import type { PublicSeo } from "@/lib/seo/types";
 
 export type BlogPostListItem = {
   slug: string;
@@ -7,10 +8,13 @@ export type BlogPostListItem = {
   date: string;
   readTime: number;
   category: string;
+  noindex?: boolean;
 };
 
 export type BlogPostDetail = BlogPostListItem & {
   content: string[];
+  seo?: PublicSeo;
+  updatedAt?: string;
 };
 
 type ApiResponse<T> = {

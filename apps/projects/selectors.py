@@ -3,9 +3,28 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q, QuerySet
 
-from apps.projects.models import Project
+from apps.employees.models import Employee
+from apps.projects.models import Project, ProjectNote
 
 User = get_user_model()
+
+
+def list_telegram_ready_employees() -> QuerySet[Employee]:
+    """Return active employees the bot can message."""
+    return (
+        Employee.objects.filter(
+            user__is_active=True,
+            user__telegram_account__chat_id__isnull=False,
+            user__telegram_account__notifications_enabled=True,
+        )
+        .select_related("user", "user__telegram_account", "position")
+        .order_by("user__last_name", "user__first_name", "user__email")
+    )
+
+
+def list_project_notes(*, project: Project) -> QuerySet[ProjectNote]:
+    """Return notes for a project, newest first."""
+    return project.notes.select_related("recipient", "created_by")
 
 
 def list_projects_for_assignee(*, assignee: User) -> QuerySet[Project]:

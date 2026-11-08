@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Форма Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Manrope,sans-serif;background:#0c0b0a;color:#f5f0e8}
+.hero{min-height:100vh;position:relative;overflow:hidden;
+background:linear-gradient(105deg,rgba(12,11,10,.78) 0%,rgba(12,11,10,.25) 55%,rgba(12,11,10,.55) 100%),
+url("https://images.unsplash.com/photo-1782392440011-b0bb69d31a26?w=1800&h=1100&fit=crop&auto=format") center/cover no-repeat}
+header{display:flex;justify-content:space-between;align-items:center;padding:28px 56px;position:relative;z-index:2}
+.logo{letter-spacing:.22em;font-size:11px;text-transform:uppercase;opacity:.9}
+.logo b{display:block;font-size:20px;letter-spacing:.14em;font-weight:600}
+nav{display:flex;gap:32px;font-size:13px;opacity:.75}
+.cta{border:1px solid rgba(245,240,232,.4);padding:12px 18px;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.content{position:relative;z-index:2;padding:14vh 56px 80px;max-width:860px}
+.eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;opacity:.65;margin-bottom:28px}
+h1{font-family:"Cormorant Garamond",serif;font-size:clamp(52px,7.2vw,92px);line-height:.95;font-weight:500}
+h1 em{font-style:italic;color:#d8c3a5}
+.sub{margin-top:28px;font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.7}
+.actions{display:flex;gap:14px;margin-top:44px}
+.btn{padding:16px 24px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;background:#f5f0e8;color:#0c0b0a;border:none}
+.btn.ghost{background:transparent;color:#f5f0e8;border:1px solid rgba(245,240,232,.35)}
+</style>
+</head>
+<body>
+<section class="hero">
+<header>
+<div class="logo"><b>Форма</b>STUDIO</div>
+<nav><span>Проєкти</span><span>Процес</span><span>Майстерня</span><span>Контакти</span></nav>
+<div class="cta">Обговорити проєкт</div>
+</header>
+<div class="content">
+<p class="eyebrow">Форма Studio · Київ, Україна</p>
+<h1>Меблі, <em>створені</em><br/>під ваш простір.</h1>
+<p class="sub">Проєктування · Виробництво · Монтаж</p>
+<div class="actions"><button class="btn">Дивитись проєкти</button><button class="btn ghost">Про процес</button></div>
+</div>
+</section>
+</body>
+</html>

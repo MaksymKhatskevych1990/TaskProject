@@ -1,9 +1,12 @@
-import { SECTIONS, SERVICES } from "@/lib/site-data";
+import Link from "next/link";
+import { getSiteContent } from "@/lib/site-content";
+import { serviceHrefByTitle } from "@/lib/marketing-pages";
 
-const featuredServices = SERVICES.filter((service) => service.featured);
-const additionalServices = SERVICES.filter((service) => !service.featured);
+export async function ServicesSection() {
+  const content = await getSiteContent();
+  const featuredServices = content.services.filter((service) => service.featured);
+  const additionalServices = content.services.filter((service) => !service.featured);
 
-export function ServicesSection() {
   return (
     <section id="services" className="py-24 sm:py-32">
       <div className="mx-auto max-w-[90rem] px-5 sm:px-8 lg:px-12">
@@ -11,10 +14,10 @@ export function ServicesSection() {
           <div className="lg:sticky lg:top-28 lg:self-start">
             <p className="section-number mb-4">01</p>
             <h2 className="editorial-heading text-3xl sm:text-4xl">
-              {SECTIONS.services.title}
+              {content.sections.services.title}
             </h2>
             <p className="mt-4 text-sm leading-relaxed text-muted">
-              {SECTIONS.services.subtitle}
+              {content.sections.services.subtitle}
             </p>
           </div>
 
@@ -30,12 +33,21 @@ export function ServicesSection() {
                   </span>
                   <div>
                     <h3 className="editorial-heading text-xl sm:text-2xl">
-                      {service.title}
+                      {serviceHrefByTitle(service.title) ? (
+                        <Link
+                          href={serviceHrefByTitle(service.title)!}
+                          className="hover:text-accent-bright"
+                        >
+                          {service.title}
+                        </Link>
+                      ) : (
+                        service.title
+                      )}
                     </h3>
                     <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted">
                       {service.description}
                     </p>
-                    {"features" in service && service.features && (
+                    {service.features.length > 0 && (
                       <ul className="mt-6 grid gap-2 sm:grid-cols-2">
                         {service.features.map((feature) => (
                           <li
@@ -55,11 +67,22 @@ export function ServicesSection() {
 
             {additionalServices.length > 0 && (
               <div className="border-t border-[var(--card-border)] pt-10">
-                <p className="label-mono mb-8">{SECTIONS.services.also}</p>
+                <p className="label-mono mb-8">{content.sections.services.also}</p>
                 <div className="grid gap-8 sm:grid-cols-2">
                   {additionalServices.map((service) => (
                     <article key={service.title}>
-                      <h3 className="text-base font-semibold">{service.title}</h3>
+                    <h3 className="text-base font-semibold">
+                      {serviceHrefByTitle(service.title) ? (
+                        <Link
+                          href={serviceHrefByTitle(service.title)!}
+                          className="hover:text-accent-bright"
+                        >
+                          {service.title}
+                        </Link>
+                      ) : (
+                        service.title
+                      )}
+                    </h3>
                       <p className="mt-2 text-sm leading-relaxed text-muted">
                         {service.description}
                       </p>

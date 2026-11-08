@@ -1,12 +1,9 @@
 import type { BlogPostDetail, BlogPostListItem } from "@/lib/blog-api";
-import {
-  FAQ_ITEMS,
-  GEO_LOCATIONS,
-  SEO,
-  SERVICES,
-  SITE,
-  TESTIMONIALS,
-} from "@/lib/site-data";
+import { isPlaceholderPhone } from "@/lib/phone";
+import { isCredibleOffice } from "@/lib/office";
+import type { PortfolioProjectListItem } from "@/lib/portfolio-api";
+import { SEO } from "@/lib/site-data";
+import { fallbackSiteContent, type SiteContent, type SiteOffice } from "@/lib/site-content";
 import { absoluteUrl, getSiteUrl } from "@/lib/seo/site-url";
 
 type SchemaNode = Record<string, unknown>;
@@ -14,15 +11,24 @@ type SchemaNode = Record<string, unknown>;
 const ORG_ID = `${getSiteUrl()}/#organization`;
 const WEBSITE_ID = `${getSiteUrl()}/#website`;
 
-function postalAddress(location: (typeof GEO_LOCATIONS)[number]): SchemaNode {
-  return {
+function resolveSite(content?: SiteContent): SiteContent {
+  return content ?? fallbackSiteContent;
+}
+
+function postalAddress(location: SiteOffice): SchemaNode {
+  const address: SchemaNode = {
     "@type": "PostalAddress",
-    streetAddress: location.streetAddress,
     addressLocality: location.addressLocality,
     addressRegion: location.addressRegion,
-    postalCode: location.postalCode,
     addressCountry: location.addressCountry,
   };
+  if (location.streetAddress.trim() && isCredibleOffice(location)) {
+    address.streetAddress = location.streetAddress;
+  }
+  if (location.postalCode && isCredibleOffice(location)) {
+    address.postalCode = location.postalCode;
+  }
+  return address;
 }
 
 function openingHoursSpecification(): SchemaNode {
@@ -34,63 +40,81 @@ function openingHoursSpecification(): SchemaNode {
   };
 }
 
-export function buildOrganizationNode(): SchemaNode {
-  const headquarters = GEO_LOCATIONS.find((location) => location.isHeadquarters) ?? GEO_LOCATIONS[0];
+export function buildOrganizationNode(content?: SiteContent): SchemaNode {
+  const site = resolveSite(content);
+  const headquarters =
+    site.offices.find((location) => location.isHeadquarters) ?? site.offices[0];
+  const phone = isPlaceholderPhone(site.phone) ? undefined : site.phone;
 
   return {
     "@type": ["Organization", "ProfessionalService"],
     "@id": ORG_ID,
-    name: SITE.brand,
-    alternateName: SITE.brandShort,
+    name: site.brand,
+    alternateName: site.brandShort,
     url: getSiteUrl(),
     logo: {
       "@type": "ImageObject",
       url: absoluteUrl("/og-image.png"),
     },
     image: absoluteUrl("/og-image.png"),
-    description: SITE.description,
-    email: SITE.email,
-    telephone: SITE.phone,
-    foundingDate: String(SITE.foundingYear),
-    address: postalAddress(headquarters),
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: headquarters.geo.latitude,
-      longitude: headquarters.geo.longitude,
-    },
+    description: site.description,
+    email: site.email,
+    ...(phone ? { telephone: phone } : {}),
+    foundingDate: String(site.foundingYear),
+    address: headquarters
+      ? postalAddress(headquarters)
+      : {
+          "@type": "PostalAddress",
+          addressLocality: "Дніпро",
+          addressCountry: "UA",
+        },
+    ...(headquarters
+      ? {
+          geo: {
+            "@type": "GeoCoordinates",
+            latitude: headquarters.geo.latitude,
+            longitude: headquarters.geo.longitude,
+          },
+        }
+      : {}),
     openingHoursSpecification: openingHoursSpecification(),
     areaServed: SEO.areaServed.map((name) => ({
       "@type": "AdministrativeArea",
       name,
     })),
     knowsAbout: SEO.knowsAbout,
-    sameAs: [...SITE.sameAs],
+    sameAs: [site.telegramUrl],
     contactPoint: [
       {
         "@type": "ContactPoint",
         contactType: "sales",
-        telephone: SITE.phone,
-        email: SITE.email,
+        ...(phone ? { telephone: phone } : {}),
+        email: site.email,
         availableLanguage: ["Ukrainian", "English"],
         areaServed: "UA",
       },
       {
         "@type": "ContactPoint",
         contactType: "customer support",
-        url: SITE.telegramUrl,
+        url: site.telegramUrl,
         availableLanguage: ["Ukrainian", "English"],
       },
     ],
     hasOfferCatalog: {
       "@type": "OfferCatalog",
-      name: "Digital-послуги",
-      itemListElement: SERVICES.filter((service) => service.featured).map((service, index) => ({
+      name: "Сайти, магазини, SEO, реклама і автоматизація",
+      itemListElement: site.pricing.map((plan, index) => ({
         "@type": "Offer",
         position: index + 1,
+        name: plan.name,
+        description: plan.description,
+        price: plan.price,
+        priceCurrency: "UAH",
+        availability: "https://schema.org/InStock",
+        url: absoluteUrl(`/?plan=${plan.slug}#contact`),
         itemOffered: {
           "@type": "Service",
-          name: service.title,
-          description: service.description,
+          name: plan.name,
           provider: { "@id": ORG_ID },
         },
       })),
@@ -98,47 +122,43 @@ export function buildOrganizationNode(): SchemaNode {
   };
 }
 
-export function buildLocalBusinessNodes(): SchemaNode[] {
-  return GEO_LOCATIONS.map((location) => ({
-    "@type": "LocalBusiness",
-    "@id": `${getSiteUrl()}/#location-${location.id}`,
-    name: `${SITE.brand} — ${location.name}`,
-    description: `${SITE.brand}: дизайн, розробка сайтів, SEO та Telegram-боти в ${location.addressLocality}.`,
-    url: getSiteUrl(),
-    telephone: location.telephone,
-    email: SITE.email,
-    parentOrganization: { "@id": ORG_ID },
-    address: postalAddress(location),
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: location.geo.latitude,
-      longitude: location.geo.longitude,
-    },
-    openingHoursSpecification: openingHoursSpecification(),
-    areaServed: {
-      "@type": "City",
-      name: location.addressLocality,
-    },
-  }));
+export function buildLocalBusinessNodes(content?: SiteContent): SchemaNode[] {
+  const site = resolveSite(content);
+  return site.offices.filter(isCredibleOffice).filter((location) => location.streetAddress.trim()).map(
+    (location) => ({
+      "@type": "ProfessionalService",
+      "@id": `${getSiteUrl()}/#location-${location.id}`,
+      name: `${site.brand} — ${location.name}`,
+      description: `${site.brand}: розробка сайтів, SEO та Telegram-боти. ${location.addressLocality}.`,
+      url: getSiteUrl(),
+      telephone: location.telephone,
+      email: site.email,
+      parentOrganization: { "@id": ORG_ID },
+      address: postalAddress(location),
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: location.geo.latitude,
+        longitude: location.geo.longitude,
+      },
+      openingHoursSpecification: openingHoursSpecification(),
+      areaServed: {
+        "@type": "City",
+        name: location.addressLocality,
+      },
+    }),
+  );
 }
 
-export function buildWebSiteNode(): SchemaNode {
+export function buildWebSiteNode(content?: SiteContent): SchemaNode {
+  const site = resolveSite(content);
   return {
     "@type": "WebSite",
     "@id": WEBSITE_ID,
-    name: SITE.brand,
+    name: site.brand,
     url: getSiteUrl(),
-    description: SITE.description,
-    inLanguage: SITE.language,
+    description: site.description,
+    inLanguage: site.locale.startsWith("uk") ? "uk" : site.locale,
     publisher: { "@id": ORG_ID },
-    potentialAction: {
-      "@type": "SearchAction",
-      target: {
-        "@type": "EntryPoint",
-        urlTemplate: `${getSiteUrl()}/blog?q={search_term_string}`,
-      },
-      "query-input": "required name=search_term_string",
-    },
   };
 }
 
@@ -161,12 +181,13 @@ export function buildWebPageNode({
     description,
     isPartOf: { "@id": WEBSITE_ID },
     about: { "@id": ORG_ID },
-    inLanguage: SITE.language,
+    inLanguage: "uk",
   };
 }
 
-export function buildServiceNodes(): SchemaNode[] {
-  return SERVICES.map((service) => ({
+export function buildServiceNodes(content?: SiteContent): SchemaNode[] {
+  const site = resolveSite(content);
+  return site.services.map((service) => ({
     "@type": "Service",
     "@id": `${getSiteUrl()}/#service-${encodeURIComponent(service.title)}`,
     name: service.title,
@@ -195,11 +216,12 @@ export function buildServiceNodes(): SchemaNode[] {
   }));
 }
 
-export function buildFaqPageNode(): SchemaNode {
+export function buildFaqPageNode(content?: SiteContent): SchemaNode {
+  const site = resolveSite(content);
   return {
     "@type": "FAQPage",
     "@id": `${getSiteUrl()}/#faq`,
-    mainEntity: FAQ_ITEMS.map((item) => ({
+    mainEntity: site.faq.map((item) => ({
       "@type": "Question",
       name: item.question,
       acceptedAnswer: {
@@ -210,8 +232,9 @@ export function buildFaqPageNode(): SchemaNode {
   };
 }
 
-export function buildReviewNodes(): SchemaNode[] {
-  const ratings = TESTIMONIALS.map((item) => item.rating);
+export function buildReviewNodes(content?: SiteContent): SchemaNode[] {
+  const site = resolveSite(content);
+  const ratings = site.testimonials.map((item) => item.rating);
   const average =
     ratings.reduce((sum, rating) => sum + rating, 0) / Math.max(ratings.length, 1);
 
@@ -223,10 +246,10 @@ export function buildReviewNodes(): SchemaNode[] {
       ratingValue: average.toFixed(1),
       bestRating: "5",
       worstRating: "1",
-      ratingCount: TESTIMONIALS.length,
-      reviewCount: TESTIMONIALS.length,
+      ratingCount: site.testimonials.length,
+      reviewCount: site.testimonials.length,
     },
-    ...TESTIMONIALS.map((item, index) => ({
+    ...site.testimonials.map((item, index) => ({
       "@type": "Review",
       "@id": `${getSiteUrl()}/#review-${index + 1}`,
       itemReviewed: { "@id": ORG_ID },
@@ -245,31 +268,42 @@ export function buildReviewNodes(): SchemaNode[] {
   ];
 }
 
-export function buildHomePageGraph(): SchemaNode[] {
+export function buildHomePageGraph(
+  page?: {
+    name?: string;
+    description?: string;
+  },
+  content?: SiteContent,
+): SchemaNode[] {
+  const site = resolveSite(content);
   return [
-    ...buildLocalBusinessNodes(),
+    ...buildLocalBusinessNodes(site),
     buildWebPageNode({
       path: "/",
-      name: SEO.defaultTitle,
-      description: SITE.description,
+      name: page?.name || `${site.brand} — ${site.tagline}`,
+      description: page?.description || site.description,
     }),
-    ...buildServiceNodes(),
-    buildFaqPageNode(),
-    ...buildReviewNodes(),
+    ...buildServiceNodes(site),
+    buildFaqPageNode(site),
+    ...buildReviewNodes(site),
   ];
 }
 
-export function buildBlogListGraph(posts: BlogPostListItem[]): SchemaNode[] {
+export function buildBlogListGraph(
+  posts: BlogPostListItem[],
+  content?: SiteContent,
+): SchemaNode[] {
+  const site = resolveSite(content);
   return [
     buildWebPageNode({
       path: "/blog",
-      name: `Блог — ${SITE.brand}`,
-      description: `Поради з дизайну, розробки сайтів та SEO від команди ${SITE.brandShort}.`,
+      name: `Блог — ${site.brand}`,
+      description: `Поради з дизайну, розробки сайтів та SEO від команди ${site.brandShort}.`,
     }),
     {
       "@type": "CollectionPage",
       "@id": `${absoluteUrl("/blog")}#collection`,
-      name: `Блог — ${SITE.brand}`,
+      name: `Блог — ${site.brand}`,
       url: absoluteUrl("/blog"),
       isPartOf: { "@id": WEBSITE_ID },
       mainEntity: {
@@ -285,33 +319,39 @@ export function buildBlogListGraph(posts: BlogPostListItem[]): SchemaNode[] {
   ];
 }
 
-export function buildBlogPostGraph(post: BlogPostDetail): SchemaNode[] {
-  const url = absoluteUrl(`/blog/${post.slug}`);
+export function buildBlogPostGraph(
+  post: BlogPostDetail,
+  content?: SiteContent,
+): SchemaNode[] {
+  const site = resolveSite(content);
+  const url = post.seo?.canonicalUrl || absoluteUrl(`/blog/${post.slug}`);
+  const headline = post.seo?.h1 || post.title;
+  const description = post.seo?.description || post.excerpt;
 
   return [
     buildWebPageNode({
       path: `/blog/${post.slug}`,
-      name: post.title,
-      description: post.excerpt,
+      name: headline,
+      description,
     }),
     {
       "@type": "BlogPosting",
       "@id": `${url}#article`,
-      headline: post.title,
-      description: post.excerpt,
+      headline,
+      description,
       url,
       datePublished: post.date,
-      dateModified: post.date,
-      inLanguage: SITE.language,
+      dateModified: post.updatedAt || post.date,
+      inLanguage: site.locale.startsWith("uk") ? "uk" : site.locale,
       author: {
         "@type": "Organization",
         "@id": ORG_ID,
-        name: SITE.brand,
+        name: site.brand,
       },
       publisher: {
         "@type": "Organization",
         "@id": ORG_ID,
-        name: SITE.brand,
+        name: site.brand,
         logo: {
           "@type": "ImageObject",
           url: absoluteUrl("/og-image.png"),
@@ -352,9 +392,55 @@ export function buildBlogPostGraph(post: BlogPostDetail): SchemaNode[] {
   ];
 }
 
+export function buildBreadcrumbNode(
+  items: { name: string; path: string }[],
+): SchemaNode {
+  return {
+    "@type": "BreadcrumbList",
+    itemListElement: items.map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: absoluteUrl(item.path),
+    })),
+  };
+}
+
+export function buildPortfolioListNode(projects: PortfolioProjectListItem[]): SchemaNode {
+  return {
+    "@type": "ItemList",
+    "@id": `${absoluteUrl("/works")}#list`,
+    name: "Портфоліо",
+    itemListElement: projects.map((project, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: absoluteUrl(`/works/${project.slug}`),
+      name: project.title,
+    })),
+  };
+}
+
+export function buildCreativeWorkNode(project: {
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+}): SchemaNode {
+  const url = absoluteUrl(`/works/${project.slug}`);
+  return {
+    "@type": "CreativeWork",
+    "@id": `${url}#work`,
+    name: project.title,
+    description: project.description,
+    url,
+    genre: project.category,
+    creator: { "@id": ORG_ID },
+  };
+}
+
 export function buildSchemaGraph(nodes: SchemaNode[]): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
-    "@graph": nodes,
+    "@graph": nodes.filter(Boolean),
   };
 }

@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { FAQ_ITEMS, SECTIONS } from "@/lib/site-data";
+import { useSiteContent } from "@/components/site-content/SiteContentProvider";
 import { cn } from "@/lib/utils";
 
 export function FAQSection() {
+  const content = useSiteContent();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
@@ -14,12 +15,12 @@ export function FAQSection() {
           <div>
             <p className="section-number mb-4">07</p>
             <h2 className="editorial-heading text-3xl sm:text-4xl">
-              {SECTIONS.faq.title}
+              {content.sections.faq.title}
             </h2>
           </div>
 
           <div>
-            {FAQ_ITEMS.map((item, index) => {
+            {content.faq.map((item, index) => {
               const isOpen = openIndex === index;
 
               return (

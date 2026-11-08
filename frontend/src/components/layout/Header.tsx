@@ -4,10 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
-import { HEADER, HERO, NAV_LINKS, SITE } from "@/lib/site-data";
+import { useSiteContent } from "@/components/site-content/SiteContentProvider";
+import { HEADER } from "@/lib/site-data";
+import { formatUaPhone, isPlaceholderPhone, toTelHref } from "@/lib/phone";
 import { cn } from "@/lib/utils";
 
 export function Header() {
+  const content = useSiteContent();
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -47,16 +50,16 @@ export function Header() {
           href="/"
           className="flex shrink-0 items-center"
           onClick={closeMenu}
-          aria-label={`${SITE.brand} — на головну`}
+          aria-label={`${content.brand} — на головну`}
         >
-          <BrandLogo emblemVariant="header" emblemSize="sm" />
+          <BrandLogo emblemVariant="header" emblemSize="sm" brandShort={content.brandShort} />
         </Link>
 
         <nav
           className="hidden items-center gap-8 md:flex"
           aria-label={HEADER.navigation}
         >
-          {NAV_LINKS.map((link) => (
+          {content.nav.map((link) => (
             <Link
               key={link.href}
               href={link.href}
@@ -68,6 +71,14 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-4">
+          {!isPlaceholderPhone(content.phone) ? (
+            <a
+              href={toTelHref(content.phone)}
+              className="hidden font-[family-name:var(--font-jetbrains)] text-xs tracking-wide text-muted transition-colors hover:text-foreground lg:inline"
+            >
+              {formatUaPhone(content.phone)}
+            </a>
+          ) : null}
           <Link
             href="/#contact"
             className={cn(
@@ -79,7 +90,7 @@ export function Header() {
             tabIndex={showHeaderCta ? 0 : -1}
             aria-hidden={!showHeaderCta}
           >
-            {HERO.primaryCta}
+            {content.hero.primaryCta}
           </Link>
 
           <button
@@ -127,7 +138,7 @@ export function Header() {
           aria-label={HEADER.navigation}
         >
           <ul className="space-y-6">
-            {NAV_LINKS.map((link, index) => (
+            {content.nav.map((link, index) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
@@ -151,7 +162,7 @@ export function Header() {
               onClick={closeMenu}
               className="btn-primary px-8 py-3.5"
             >
-              {HERO.primaryCta}
+              {content.hero.primaryCta}
             </Link>
           </div>
         </nav>

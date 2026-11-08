@@ -1,6 +1,7 @@
 """Website API tests."""
 
-from datetime import datetime, timezone as dt_timezone
+from datetime import datetime
+from datetime import timezone as dt_timezone
 
 from django.urls import reverse
 from rest_framework import status
@@ -62,7 +63,10 @@ class WebsiteBlogAPITests(BaseAPITestCase):
     def setUp(self) -> None:
         """Create sample blog posts."""
         super().setUp()
-        self.category = BlogCategory.objects.create(name="SEO", slug="seo")
+        self.category, _ = BlogCategory.objects.get_or_create(
+            slug="seo",
+            defaults={"name": "SEO"},
+        )
         self.published = BlogPost.objects.create(
             title="SEO checklist",
             slug="seo-checklist",
@@ -88,10 +92,11 @@ class WebsiteBlogAPITests(BaseAPITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data["success"])
-        self.assertEqual(len(response.data["data"]), 1)
-        self.assertEqual(response.data["data"][0]["slug"], "seo-checklist")
-        self.assertEqual(response.data["data"][0]["category"], "SEO")
-        self.assertEqual(response.data["data"][0]["readTime"], 7)
+        posts = {item["slug"]: item for item in response.data["data"]}
+        self.assertIn("seo-checklist", posts)
+        self.assertNotIn("draft-article", posts)
+        self.assertEqual(posts["seo-checklist"]["category"], "SEO")
+        self.assertEqual(posts["seo-checklist"]["readTime"], 7)
 
     def test_blog_detail_returns_content_blocks(self) -> None:
         """Single post endpoint returns parsed content blocks."""
@@ -119,7 +124,7 @@ class WebsiteBlogAPITests(BaseAPITestCase):
 
     def test_blog_detail_supports_unicode_slug(self) -> None:
         """Unicode slugs are reachable through the detail endpoint."""
-        BlogPost.objects.create(
+        post = BlogPost.objects.create(
             title="Unicode slug post",
             slug="внедрение-ai-систем",
             excerpt="Unicode slug excerpt",
@@ -129,10 +134,10 @@ class WebsiteBlogAPITests(BaseAPITestCase):
             published_at=datetime(2026, 8, 3, tzinfo=dt_timezone.utc),
         )
 
-        response = self.client.get("/api/v1/website/blog/внедрение-ai-систем/")
+        response = self.client.get(f"/api/v1/website/blog/{post.slug}/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["data"]["slug"], "внедрение-ai-систем")
+        self.assertEqual(response.data["data"]["slug"], post.slug)
 
 
 class WebsitePortfolioAPITests(BaseAPITestCase):
@@ -145,7 +150,7 @@ class WebsitePortfolioAPITests(BaseAPITestCase):
 
         self.published = PortfolioProject.objects.create(
             title="Glow Beauty",
-            slug="glow-beauty",
+            slug="glow-beauty-test",
             category="E-commerce",
             description="Store for cosmetics",
             tags=["Дизайн", "SEO"],
@@ -173,19 +178,24 @@ class WebsitePortfolioAPITests(BaseAPITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertTrue(response.data["success"])
-        self.assertEqual(len(response.data["data"]), 1)
-        self.assertEqual(response.data["data"][0]["slug"], "glow-beauty")
-        self.assertTrue(response.data["data"][0]["hasCaseStudy"])
-        self.assertEqual(response.data["data"][0]["before"], "12 orders/month")
+        projects = {item["slug"]: item for item in response.data["data"]}
+        self.assertIn("glow-beauty-test", projects)
+        self.assertNotIn("draft-project", projects)
+        self.assertTrue(projects["glow-beauty-test"]["hasCaseStudy"])
+        self.assertEqual(projects["glow-beauty-test"]["before"], "12 orders/month")
 
     def test_portfolio_detail_returns_case_study_fields(self) -> None:
         """Single project endpoint returns case study details."""
         response = self.client.get(
-            reverse("api:v1:website:portfolio-detail", kwargs={"slug": "glow-beauty"}),
+            reverse(
+                "api:v1:website:portfolio-detail", kwargs={"slug": "glow-beauty-test"}
+            ),
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["data"]["caseDescription"], "Full e-commerce launch")
+        self.assertEqual(
+            response.data["data"]["caseDescription"], "Full e-commerce launch"
+        )
         self.assertEqual(response.data["data"]["gallery"], [])
 
     def test_portfolio_detail_returns_404_for_missing_or_draft_project(self) -> None:
@@ -194,7 +204,9 @@ class WebsitePortfolioAPITests(BaseAPITestCase):
             reverse("api:v1:website:portfolio-detail", kwargs={"slug": "missing"}),
         )
         draft = self.client.get(
-            reverse("api:v1:website:portfolio-detail", kwargs={"slug": "draft-project"}),
+            reverse(
+                "api:v1:website:portfolio-detail", kwargs={"slug": "draft-project"}
+            ),
         )
 
         self.assertEqual(missing.status_code, status.HTTP_404_NOT_FOUND)

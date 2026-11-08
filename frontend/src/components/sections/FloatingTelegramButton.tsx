@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FOOTER, SITE } from "@/lib/site-data";
+import { useSiteContent } from "@/components/site-content/SiteContentProvider";
 
 export function FloatingTelegramButton() {
+  const content = useSiteContent();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -14,10 +15,10 @@ export function FloatingTelegramButton() {
 
   return (
     <a
-      href={SITE.telegramUrl}
+      href={content.telegramUrl}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={FOOTER.writeInTelegram}
+      aria-label={content.footer.writeInTelegram}
       className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-accent-warm px-4 py-3 text-sm font-semibold text-background shadow-lg transition-all duration-500 hover:bg-accent-warm-bright ${
         visible
           ? "translate-y-0 opacity-100"

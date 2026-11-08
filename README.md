@@ -15,6 +15,12 @@ The application is available at <http://localhost:8080> and the administration
 site at <http://localhost:8080/admin/>. The public landing page is served at
 the root URL.
 
+To open the same stack on a phone, keep it running and start a public tunnel:
+
+```bash
+./scripts/ngrok.sh
+```
+
 ## Frontend
 
 The marketing site lives in `frontend/` (Next.js, React, TypeScript, Tailwind).

@@ -46,7 +46,10 @@ class WebsiteSelectorTests(BaseTestCase):
     def setUp(self) -> None:
         """Create sample blog content."""
         super().setUp()
-        self.category = BlogCategory.objects.create(name="SEO", slug="seo")
+        self.category, _ = BlogCategory.objects.get_or_create(
+            slug="seo",
+            defaults={"name": "SEO"},
+        )
         self.published = BlogPost.objects.create(
             title="Published post",
             slug="published-post",
@@ -68,9 +71,9 @@ class WebsiteSelectorTests(BaseTestCase):
 
     def test_list_published_blog_posts_excludes_drafts(self) -> None:
         """Only published posts appear in the public list."""
-        posts = list(list_published_blog_posts())
-        self.assertEqual(len(posts), 1)
-        self.assertEqual(posts[0].slug, "published-post")
+        slugs = list(list_published_blog_posts().values_list("slug", flat=True))
+        self.assertIn("published-post", slugs)
+        self.assertNotIn("draft-post", slugs)
 
     def test_get_published_blog_post_returns_none_for_draft(self) -> None:
         """Draft posts are not accessible by slug."""

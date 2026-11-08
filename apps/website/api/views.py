@@ -7,13 +7,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.common.responses import success_response
-from apps.website import selectors, services
+from apps.website import cms, selectors, services
 from apps.website.serializers import (
     BlogPostDetailSerializer,
     BlogPostListSerializer,
     ContactLeadSerializer,
     PortfolioProjectDetailSerializer,
     PortfolioProjectListSerializer,
+    SiteSeoSettingsSerializer,
 )
 
 
@@ -41,7 +42,9 @@ class BlogPostListView(APIView):
     def get(self, request: Request) -> Response:
         """List published blog posts."""
         posts = selectors.list_published_blog_posts()
-        return success_response(BlogPostListSerializer(posts, many=True).data)
+        return success_response(
+            BlogPostListSerializer(posts, many=True, context={"request": request}).data
+        )
 
 
 class BlogPostDetailView(APIView):
@@ -55,7 +58,9 @@ class BlogPostDetailView(APIView):
         post = selectors.get_published_blog_post(slug=slug)
         if post is None:
             raise NotFound("Статья не найдена.")
-        return success_response(BlogPostDetailSerializer(post).data)
+        return success_response(
+            BlogPostDetailSerializer(post, context={"request": request}).data
+        )
 
 
 class PortfolioProjectListView(APIView):
@@ -91,3 +96,35 @@ class PortfolioProjectDetailView(APIView):
             context={"request": request},
         )
         return success_response(serializer.data)
+
+
+class SiteSeoSettingsView(APIView):
+    """Return public SEO defaults for the marketing site."""
+
+    authentication_classes: list[type] = []
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request) -> Response:
+        """Return homepage and blog SEO settings."""
+        settings = selectors.get_site_seo_settings()
+        serializer = SiteSeoSettingsSerializer(
+            settings,
+            context={"request": request},
+        )
+        return success_response(serializer.data)
+
+
+class SiteContentView(APIView):
+    """Return the full public landing-page content from site settings."""
+
+    authentication_classes: list[type] = []
+    permission_classes = [AllowAny]
+
+    def get(self, request: Request) -> Response:
+        """Return contacts, sections, and repeatable blocks."""
+        settings = cms.get_site_settings()
+        serializer = SiteSeoSettingsSerializer(
+            settings,
+            context={"request": request},
+        )
+        return success_response(cms.build_site_content(settings, serializer=serializer))

@@ -16,4 +16,6 @@ urlpatterns = [
         views.PortfolioProjectDetailView.as_view(),
         name="portfolio-detail",
     ),
+    path("seo/", views.SiteSeoSettingsView.as_view(), name="seo-settings"),
+    path("content/", views.SiteContentView.as_view(), name="site-content"),
 ]

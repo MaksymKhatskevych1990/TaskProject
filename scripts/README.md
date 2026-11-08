@@ -2,6 +2,9 @@
 
 Place repeatable maintenance and deployment scripts in this directory.
 
+`ngrok.sh` publishes the running Studio stack (`./run.sh`) through a public
+HTTPS URL so you can open the landing page and admin on a phone.
+
 Scripts must:
 
 - use non-interactive arguments where practical;

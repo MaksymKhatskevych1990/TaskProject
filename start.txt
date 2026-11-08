@@ -10,6 +10,12 @@ DOCKER BROKEN (Snap / daemon / compose errors)
   docker info
   ./run.sh
 
+MOBILE DEMO (ngrok)
+  ./run.sh
+  ./scripts/ngrok.sh
+  Open the printed HTTPS URL on your phone. Free ngrok may show a
+  warning page once — tap Visit Site.
+
 SERVICE URLS
   Application:   http://localhost:8080
   Admin:         http://localhost:8080/admin/

@@ -8,7 +8,14 @@ type PageMetadataOptions = {
   path?: string;
   type?: "website" | "article";
   publishedTime?: string;
+  modifiedTime?: string;
   noIndex?: boolean;
+  ogImage?: string | null;
+  ogTitle?: string;
+  ogDescription?: string;
+  canonical?: string;
+  absoluteTitle?: boolean;
+  googleVerification?: string;
 };
 
 export function createPageMetadata({
@@ -17,17 +24,27 @@ export function createPageMetadata({
   path = "/",
   type = "website",
   publishedTime,
+  modifiedTime,
   noIndex = false,
+  ogImage,
+  ogTitle,
+  ogDescription,
+  canonical,
+  absoluteTitle = false,
+  googleVerification,
 }: PageMetadataOptions = {}): Metadata {
-  const url = absoluteUrl(path);
-  const ogImage = absoluteUrl(SEO.ogImagePath);
+  const url = canonical || absoluteUrl(path);
+  const image = ogImage || absoluteUrl(SEO.ogImagePath);
+  const socialTitle = ogTitle || title;
+  const socialDescription = ogDescription || description;
 
   return {
     metadataBase: new URL(getSiteUrl()),
-    title: {
-      default: SEO.defaultTitle,
-      template: SEO.titleTemplate,
-    },
+    title: absoluteTitle
+      ? { absolute: title }
+      : path === "/"
+        ? { default: title, template: SEO.titleTemplate }
+        : title,
     description,
     keywords: [...SITE.keywords],
     authors: [{ name: SITE.brand, url: getSiteUrl() }],
@@ -42,6 +59,7 @@ export function createPageMetadata({
       canonical: url,
       languages: {
         "uk-UA": url,
+        "x-default": url,
       },
     },
     robots: noIndex
@@ -62,24 +80,26 @@ export function createPageMetadata({
       locale: SITE.locale.replace("-", "_"),
       url,
       siteName: SITE.brand,
-      title,
-      description,
+      title: socialTitle,
+      description: socialDescription,
       images: [
         {
-          url: ogImage,
+          url: image,
           width: 1200,
           height: 630,
-          alt: SITE.brand,
+          alt: socialTitle,
         },
       ],
       ...(publishedTime ? { publishedTime } : {}),
+      ...(modifiedTime ? { modifiedTime } : {}),
     },
     twitter: {
       card: "summary_large_image",
-      title,
-      description,
-      images: [ogImage],
+      title: socialTitle,
+      description: socialDescription,
+      images: [image],
     },
+    ...(googleVerification ? { verification: { google: googleVerification } } : {}),
     other: {
       "geo.region": SEO.geoRegion,
       "geo.placename": SEO.geoPlacename,
